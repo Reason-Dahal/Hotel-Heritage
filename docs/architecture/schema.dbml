@@ -1,0 +1,56 @@
+// Database Schema - Hotel Website
+// Format: DBML (https://dbml.dbdiagram.io)
+// Note: MongoDB is document-based (NoSQL). This file documents the SHAPE
+// of each collection. There are no foreign keys / joins between collections
+// in Phase 1 - each is independent. Preview this file free at dbdiagram.io
+// by pasting it into a new diagram.
+
+Table rooms {
+  _id ObjectId [pk]
+  name varchar [not null, note: 'e.g. "Deluxe Double Room"']
+  description text
+  images varchar[] [note: 'array of Cloudinary image URLs']
+  price decimal [not null, note: 'base price per night, in local currency']
+  discountPercent int [default: 0, note: '0-100, admin controlled']
+  capacity int [note: 'max guests']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'Managed via admin panel CRUD. Public GET is read-only.'
+}
+
+Table menu_items {
+  _id ObjectId [pk]
+  name varchar [not null, note: 'e.g. "Grilled Salmon"']
+  description text
+  images varchar[] [note: 'array of Cloudinary image URLs']
+  category varchar [note: 'e.g. "Signature Dish", "Starter", "Dessert"']
+  price decimal [not null]
+  discountPercent int [default: 0, note: '0-100, admin controlled']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'Managed via admin panel CRUD. Public GET is read-only.'
+}
+
+Table notices {
+  _id ObjectId [pk]
+  title varchar [not null]
+  message text [not null]
+  image varchar [note: 'optional Cloudinary image URL']
+  active boolean [default: false, note: 'ON/OFF toggle, controls popup visibility']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'If zero notices have active=true, no popup renders at all. Multiple active notices stack/overlap on screen.'
+}
+
+Table admins {
+  _id ObjectId [pk]
+  email varchar [not null, unique]
+  hashedPassword varchar [not null, note: 'bcrypt hashed, never store plain text']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'Single admin account for Phase 1. NextAuth Credentials provider reads from this collection.'
+}

@@ -1,0 +1,397 @@
+openapi: 3.0.3
+info:
+  title: Hotel Website API
+  description: >
+    API contract for the Hotel Website system. Public GET endpoints are
+    open to all visitors. All write operations (POST/PUT/PATCH/DELETE)
+    require an authenticated admin session (NextAuth session cookie).
+  version: 1.0.0
+
+servers:
+  - url: https://your-hotel-site.vercel.app/api
+    description: Production (Vercel)
+  - url: http://localhost:3000/api
+    description: Local development
+
+tags:
+  - name: Rooms
+  - name: Menu
+  - name: Notices
+  - name: Auth
+
+paths:
+  /rooms:
+    get:
+      tags: [Rooms]
+      summary: List all rooms
+      description: Public. Returns all rooms for the "All Rooms" page and featured slideshow.
+      responses:
+        "200":
+          description: Array of rooms
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Room"
+    post:
+      tags: [Rooms]
+      summary: Create a new room
+      description: Admin only.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomInput"
+      responses:
+        "201":
+          description: Room created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/Room"
+        "401":
+          description: Not authenticated as admin
+
+  /rooms/{id}:
+    put:
+      tags: [Rooms]
+      summary: Update a room
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/RoomInput"
+      responses:
+        "200":
+          description: Room updated
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Room not found
+    delete:
+      tags: [Rooms]
+      summary: Delete a room
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Room deleted
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Room not found
+
+  /menu:
+    get:
+      tags: [Menu]
+      summary: List all menu items
+      description: Public. Returns all items for the "Full Menu" page and signature dish slideshow.
+      responses:
+        "200":
+          description: Array of menu items
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/MenuItem"
+    post:
+      tags: [Menu]
+      summary: Create a new menu item
+      description: Admin only.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemInput"
+      responses:
+        "201":
+          description: Menu item created
+        "401":
+          description: Not authenticated as admin
+
+  /menu/{id}:
+    put:
+      tags: [Menu]
+      summary: Update a menu item
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/MenuItemInput"
+      responses:
+        "200":
+          description: Menu item updated
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Menu item not found
+    delete:
+      tags: [Menu]
+      summary: Delete a menu item
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Menu item deleted
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Menu item not found
+
+  /notices:
+    get:
+      tags: [Notices]
+      summary: List active notices
+      description: Public. Returns only notices with active=true, for the popup. Empty array means no popup shows.
+      responses:
+        "200":
+          description: Array of active notices
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Notice"
+    post:
+      tags: [Notices]
+      summary: Create a new notice
+      description: Admin only.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/NoticeInput"
+      responses:
+        "201":
+          description: Notice created
+        "401":
+          description: Not authenticated as admin
+
+  /notices/{id}:
+    patch:
+      tags: [Notices]
+      summary: Toggle a notice active/inactive
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                active:
+                  type: boolean
+      responses:
+        "200":
+          description: Notice updated
+        "401":
+          description: Not authenticated as admin
+    delete:
+      tags: [Notices]
+      summary: Delete a notice
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "204":
+          description: Notice deleted
+        "401":
+          description: Not authenticated as admin
+
+  /auth/login:
+    post:
+      tags: [Auth]
+      summary: Admin login
+      description: Handled by NextAuth Credentials provider. Sets a session cookie on success.
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                email:
+                  type: string
+                password:
+                  type: string
+      responses:
+        "200":
+          description: Login successful, session cookie set
+        "401":
+          description: Invalid credentials
+
+components:
+  securitySchemes:
+    adminSession:
+      type: apiKey
+      in: cookie
+      name: next-auth.session-token
+
+  schemas:
+    Room:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        - $ref: "#/components/schemas/RoomInput"
+
+    RoomInput:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          example: "Deluxe Double Room"
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        price:
+          type: number
+          example: 120
+        discountPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
+        capacity:
+          type: integer
+          example: 2
+
+    MenuItem:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        - $ref: "#/components/schemas/MenuItemInput"
+
+    MenuItemInput:
+      type: object
+      required: [name, price]
+      properties:
+        name:
+          type: string
+          example: "Grilled Salmon"
+        description:
+          type: string
+        images:
+          type: array
+          items:
+            type: string
+            format: uri
+        category:
+          type: string
+          example: "Signature Dish"
+        price:
+          type: number
+          example: 18.5
+        discountPercent:
+          type: integer
+          minimum: 0
+          maximum: 100
+          default: 0
+
+    Notice:
+      allOf:
+        - type: object
+          properties:
+            _id:
+              type: string
+            createdAt:
+              type: string
+              format: date-time
+            updatedAt:
+              type: string
+              format: date-time
+        - $ref: "#/components/schemas/NoticeInput"
+
+    NoticeInput:
+      type: object
+      required: [title, message]
+      properties:
+        title:
+          type: string
+        message:
+          type: string
+        image:
+          type: string
+          format: uri
+        active:
+          type: boolean
+          default: false

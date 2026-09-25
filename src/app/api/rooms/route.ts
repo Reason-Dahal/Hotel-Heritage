@@ -15,3 +15,18 @@ export async function GET() {
     );
   }
 }
+
+export async function POST(request: Request) {
+  try {
+    await connectDB();
+    const body = await request.json();
+    const room = await Room.create(body);
+    return NextResponse.json({ success: true, room }, { status: 201 });
+  } catch (error) {
+    console.error(error);
+    return NextResponse.json(
+      { success: false, error: "Failed to create room" },
+      { status: 500 }
+    );
+  }
+}

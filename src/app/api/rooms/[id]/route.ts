@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Room from "@/models/Room";
+import { roomInputSchema } from "@/lib/validation";
 
 export async function PUT(
   request: Request,
@@ -10,7 +11,16 @@ export async function PUT(
     await connectDB();
     const { id } = await params;
     const body = await request.json();
-    const room = await Room.findByIdAndUpdate(id, body, { new: true });
+
+    const parsed = roomInputSchema.partial().safeParse(body);
+    if (!parsed.success) {
+      return NextResponse.json(
+        { success: false, error: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const room = await Room.findByIdAndUpdate(id, parsed.data, { new: true });
 
     if (!room) {
       return NextResponse.json(

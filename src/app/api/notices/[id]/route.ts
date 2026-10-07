@@ -2,11 +2,14 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import Notice from "@/models/Notice";
 import { noticeInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/requireAdmin";
 
 export async function PATCH(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   try {
     await connectDB();
     const { id } = await params;
@@ -43,6 +46,8 @@ export async function DELETE(
   request: Request,
   { params }: { params: Promise<{ id: string }> }
 ) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   try {
     await connectDB();
     const { id } = await params;

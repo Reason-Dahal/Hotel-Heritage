@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import MenuItem from "@/models/MenuItem";
 import { menuItemInputSchema } from "@/lib/validation";
+import { requireAdmin } from "@/lib/requireAdmin";
 
 export async function GET() {
   try {
@@ -18,6 +19,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const unauthorized = await requireAdmin();
+  if (unauthorized) return unauthorized;
   try {
     await connectDB();
     const body = await request.json();

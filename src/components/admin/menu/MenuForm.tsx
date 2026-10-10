@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TextField, TextAreaField } from "@/components/admin/FormFields";
+import {
+  TextField,
+  TextAreaField,
+  CheckboxField,
+} from "@/components/admin/FormFields";
 import ImageListEditor from "@/components/admin/ImageListEditor";
 import type { MenuItemDTO } from "./types";
 
@@ -12,6 +16,7 @@ export interface MenuItemPayload {
   discountPercent: number;
   images: string[];
   category?: string;
+  featured: boolean;
 }
 
 interface Props {
@@ -25,7 +30,6 @@ interface Props {
 type TextKey = "name" | "description" | "category" | "price" | "discountPercent";
 
 const CATEGORY_SUGGESTIONS = [
-  "Signature Dish",
   "Starter",
   "Main Course",
   "Dessert",
@@ -40,6 +44,7 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
     price: item ? String(item.price) : "",
     discountPercent: item ? String(item.discountPercent) : "0",
     images: item?.images ?? [],
+    featured: item?.featured ?? false,
   });
 
   const setField = (field: TextKey, value: string) =>
@@ -54,6 +59,7 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
       discountPercent: Number(form.discountPercent || 0),
       images: form.images,
       ...(form.category.trim() ? { category: form.category.trim() } : {}),
+      featured: form.featured,
     });
   };
 
@@ -93,7 +99,7 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
           id="menu-category"
           label="Category"
           list="menu-category-options"
-          placeholder="e.g. Signature Dish"
+          placeholder="e.g. Main Course"
           value={form.category}
           onChange={(e) => setField("category", e.target.value)}
         />
@@ -120,6 +126,16 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
           max="100"
           value={form.discountPercent}
           onChange={(e) => setField("discountPercent", e.target.value)}
+        />
+        <CheckboxField
+          id="menu-featured"
+          label="Signature dish"
+          hint="Signature dishes appear in the homepage slideshow."
+          className="sm:col-span-2"
+          checked={form.featured}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, featured: e.target.checked }))
+          }
         />
       </div>
 

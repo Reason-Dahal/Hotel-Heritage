@@ -7,6 +7,7 @@ export interface IMenuItem {
   category?: string;
   price: number;
   discountPercent: number;
+  featured: boolean;
 }
 
 const MenuItemSchema = new Schema<IMenuItem>(
@@ -17,6 +18,7 @@ const MenuItemSchema = new Schema<IMenuItem>(
     category: { type: String },
     price: { type: Number, required: true },
     discountPercent: { type: Number, default: 0, min: 0, max: 100 },
+    featured: { type: Boolean, default: false },
   },
   { timestamps: true }
 );

@@ -17,6 +17,7 @@ export default async function AdminMenuPage() {
     category: m.category ?? "",
     price: m.price,
     discountPercent: m.discountPercent ?? 0,
+    featured: m.featured ?? false,
   }));
 
   return <MenuManager items={items} />;

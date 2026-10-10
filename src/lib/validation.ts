@@ -7,6 +7,7 @@ export const roomInputSchema = z.object({
   price: z.number().positive("Price must be a positive number"),
   discountPercent: z.number().min(0).max(100).optional().default(0),
   capacity: z.number().int().positive().optional(),
+  featured: z.boolean().optional(),
 });
 
 export const menuItemInputSchema = z.object({
@@ -16,6 +17,7 @@ export const menuItemInputSchema = z.object({
   category: z.string().optional(),
   price: z.number().positive("Price must be a positive number"),
   discountPercent: z.number().min(0).max(100).optional().default(0),
+  featured: z.boolean().optional(),
 });
 
 export const noticeInputSchema = z.object({

@@ -6,4 +6,5 @@ export interface RoomDTO {
     price: number;
     discountPercent: number;
     capacity?: number;
+    featured: boolean;
   }

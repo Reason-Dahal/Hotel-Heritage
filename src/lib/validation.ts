@@ -27,6 +27,6 @@ export const menuItemInputSchema = z.object({
 export const noticeInputSchema = z.object({
   title: z.string().min(1, "Title is required"),
   message: z.string().min(1, "Message is required"),
-  image: z.string().url().optional(),
+  image: z.string().url().or(z.literal("")).optional(),
   active: z.boolean().optional(),
 });

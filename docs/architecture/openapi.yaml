@@ -18,6 +18,7 @@ tags:
   - name: Menu
   - name: Notices
   - name: Auth
+  - name: Settings
 
 paths:
   /rooms:
@@ -257,6 +258,38 @@ paths:
         "401":
           description: Not authenticated as admin
 
+  /settings:
+    get:
+      tags: [Settings]
+      summary: Get site settings
+      description: Public. Hotel name, contact details, social links, map, hero image, and banner messages.
+      responses:
+        "200":
+          description: Site settings
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SiteSettings"
+    put:
+      tags: [Settings]
+      summary: Update site settings
+      description: Admin only. Creates the settings document on first save.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/SiteSettings"
+      responses:
+        "200":
+          description: Settings saved
+        "400":
+          description: Validation error
+        "401":
+          description: Not authenticated as admin
+
   /auth/login:
     post:
       tags: [Auth]
@@ -401,3 +434,25 @@ components:
         active:
           type: boolean
           default: false
+
+        SiteSettings:
+      type: object
+      required: [hotelName]
+      properties:
+        hotelName: { type: string, maxLength: 100 }
+        tagline: { type: string, maxLength: 160 }
+        description: { type: string, maxLength: 500 }
+        address: { type: string }
+        phone: { type: string }
+        email: { type: string }
+        facebookUrl: { type: string, description: "http(s) link or empty" }
+        instagramUrl: { type: string }
+        tiktokUrl: { type: string }
+        youtubeUrl: { type: string }
+        whatsappUrl: { type: string }
+        mapEmbedUrl: { type: string, description: "Must start with https://www.google.com/maps/embed, or empty" }
+        heroImage: { type: string }
+        bannerMessages:
+          type: array
+          maxItems: 10
+          items: { type: string, maxLength: 200 }

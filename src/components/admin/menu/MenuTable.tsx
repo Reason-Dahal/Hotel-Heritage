@@ -45,7 +45,14 @@ export default function MenuTable({ items, deletingId, onEdit, onDelete }: Props
                 <span className="text-xs text-gray-400">No photo</span>
               )}
             </td>
-            <td className="p-3 font-medium text-gray-800">{item.name}</td>
+            <td className="p-3 font-medium text-gray-800">
+              {item.name}
+              {item.featured && (
+                <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-normal text-amber-700">
+                  Featured
+                </span>
+              )}
+            </td>
             <td className="p-3 text-gray-700">{item.category || "-"}</td>
             <td className="p-3">
               <PriceDisplay price={item.price} discountPercent={item.discountPercent} />

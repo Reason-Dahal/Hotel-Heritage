@@ -18,6 +18,7 @@ export default async function AdminRoomsPage() {
     price: r.price,
     discountPercent: r.discountPercent ?? 0,
     capacity: r.capacity,
+    featured: r.featured ?? false,
   }));
 
   return <RoomsManager rooms={rooms} />;

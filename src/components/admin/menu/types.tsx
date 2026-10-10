@@ -6,4 +6,5 @@ export interface MenuItemDTO {
     category: string;
     price: number;
     discountPercent: number;
+    featured: boolean;
   }

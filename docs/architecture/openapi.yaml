@@ -326,6 +326,9 @@ components:
         capacity:
           type: integer
           example: 2
+        featured:
+          type: boolean
+          default: false
 
     MenuItem:
       allOf:
@@ -366,6 +369,9 @@ components:
           minimum: 0
           maximum: 100
           default: 0
+        featured:
+          type: boolean
+          default: false
 
     Notice:
       allOf:

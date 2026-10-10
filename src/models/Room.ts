@@ -7,6 +7,7 @@ export interface IRoom {
   price: number;
   discountPercent: number;
   capacity?: number;
+  featured: boolean;
 }
 
 const RoomSchema = new Schema<IRoom>(
@@ -17,6 +18,7 @@ const RoomSchema = new Schema<IRoom>(
     price: { type: Number, required: true },
     discountPercent: { type: Number, default: 0, min: 0, max: 100 },
     capacity: { type: Number },
+    featured: { type: Boolean, default: false },
   },
   { timestamps: true } // auto-adds createdAt and updatedAt
 );

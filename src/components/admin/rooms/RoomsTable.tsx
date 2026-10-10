@@ -45,7 +45,14 @@ export default function RoomsTable({ rooms, deletingId, onEdit, onDelete }: Prop
                 <span className="text-xs text-gray-400">No photo</span>
               )}
             </td>
-            <td className="p-3 font-medium text-gray-800">{room.name}</td>
+            <td className="p-3 font-medium text-gray-800">
+              {room.name}
+              {room.featured && (
+                <span className="ml-2 rounded bg-amber-100 px-1.5 py-0.5 text-xs font-normal text-amber-700">
+                  Featured
+                </span>
+              )}
+            </td>
             <td className="p-3">
               <PriceDisplay price={room.price} discountPercent={room.discountPercent} />
             </td>

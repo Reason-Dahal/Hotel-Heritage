@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { TextField, TextAreaField } from "@/components/admin/FormFields";
+import {
+  TextField,
+  TextAreaField,
+  CheckboxField,
+} from "@/components/admin/FormFields";
 import ImageListEditor from "@/components/admin/ImageListEditor";
 import type { RoomDTO } from "./types";
 
@@ -12,6 +16,7 @@ export interface RoomPayload {
   discountPercent: number;
   images: string[];
   capacity?: number;
+  featured: boolean;
 }
 
 interface Props {
@@ -22,9 +27,20 @@ interface Props {
   onCancel: () => void;
 }
 
-type TextKey = "name" | "description" | "price" | "discountPercent" | "capacity";
+type TextKey =
+  | "name"
+  | "description"
+  | "price"
+  | "discountPercent"
+  | "capacity";
 
-export default function RoomForm({ room, saving, error, onSubmit, onCancel }: Props) {
+export default function RoomForm({
+  room,
+  saving,
+  error,
+  onSubmit,
+  onCancel,
+}: Props) {
   const [form, setForm] = useState({
     name: room?.name ?? "",
     description: room?.description ?? "",
@@ -32,6 +48,7 @@ export default function RoomForm({ room, saving, error, onSubmit, onCancel }: Pr
     discountPercent: room ? String(room.discountPercent) : "0",
     capacity: room?.capacity !== undefined ? String(room.capacity) : "",
     images: room?.images ?? [],
+    featured: room?.featured ?? false,
   });
 
   const setField = (field: TextKey, value: string) =>
@@ -46,6 +63,7 @@ export default function RoomForm({ room, saving, error, onSubmit, onCancel }: Pr
       discountPercent: Number(form.discountPercent || 0),
       images: form.images,
       ...(form.capacity ? { capacity: Number(form.capacity) } : {}),
+      featured: form.featured,
     });
   };
 
@@ -59,7 +77,10 @@ export default function RoomForm({ room, saving, error, onSubmit, onCancel }: Pr
       </h2>
 
       {error && (
-        <p role="alert" className="mb-4 rounded bg-red-100 p-3 text-sm text-red-700">
+        <p
+          role="alert"
+          className="mb-4 rounded bg-red-100 p-3 text-sm text-red-700"
+        >
           {error}
         </p>
       )}
@@ -107,6 +128,16 @@ export default function RoomForm({ room, saving, error, onSubmit, onCancel }: Pr
           min="1"
           value={form.capacity}
           onChange={(e) => setField("capacity", e.target.value)}
+        />
+        <CheckboxField
+          id="room-featured"
+          label="Featured on homepage"
+          hint="Featured rooms appear in the homepage slideshow."
+          className="sm:col-span-2"
+          checked={form.featured}
+          onChange={(e) =>
+            setForm((prev) => ({ ...prev, featured: e.target.checked }))
+          }
         />
       </div>
 

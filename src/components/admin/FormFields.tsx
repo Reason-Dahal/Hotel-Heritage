@@ -24,3 +24,30 @@ export function TextAreaField({ label, id, className = "", ...props }: TextAreaF
     </div>
   );
 }
+
+type CheckboxFieldProps = {
+  label: string;
+  id: string;
+  hint?: string;
+} & Omit<InputHTMLAttributes<HTMLInputElement>, "type">;
+
+export function CheckboxField({
+  label,
+  id,
+  hint,
+  className = "",
+  ...props
+}: CheckboxFieldProps) {
+  return (
+    <div className={className}>
+      <label
+        htmlFor={id}
+        className="flex items-center gap-2 text-sm font-medium text-gray-700"
+      >
+        <input id={id} type="checkbox" className="h-4 w-4" {...props} />
+        {label}
+      </label>
+      {hint && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
+    </div>
+  );
+}

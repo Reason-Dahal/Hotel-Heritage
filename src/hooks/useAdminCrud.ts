@@ -13,11 +13,14 @@ function formatError(error: unknown): string {
   return "Something went wrong. Please try again.";
 }
 
-export function useAdminCrud(
-  endpoint: string,
-  options: { updateMethod?: "PUT" | "PATCH" } = {}
-) {
-  const { updateMethod = "PUT" } = options;
+interface Options {
+  updateMethod?: "PUT" | "PATCH";
+  // true for one-record endpoints like /api/settings (always PUT, no id)
+  singleton?: boolean;
+}
+
+export function useAdminCrud(endpoint: string, options: Options = {}) {
+  const { updateMethod = "PUT", singleton = false } = options;
   const router = useRouter();
   const [saving, setSaving] = useState(false);
   const [deletingId, setDeletingId] = useState<string | null>(null);
@@ -49,8 +52,8 @@ export function useAdminCrud(
   async function save(id: string | null, payload: unknown): Promise<boolean> {
     setError("");
     setSaving(true);
-    const ok = await request(id ? `${endpoint}/${id}` : endpoint, {
-      method: id ? updateMethod : "POST",
+    const ok = await request(singleton || !id ? endpoint : `${endpoint}/${id}`, {
+      method: singleton ? "PUT" : id ? updateMethod : "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(payload),
     });

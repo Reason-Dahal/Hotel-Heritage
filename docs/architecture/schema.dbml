@@ -56,3 +56,24 @@ Table admins {
 
   Note: 'Single admin account for Phase 1. NextAuth Credentials provider reads from this collection.'
 }
+
+Table site_settings {
+  _id ObjectId [pk]
+  key varchar [not null, unique, note: 'always "main"; this is a singleton']
+  hotelName varchar [not null]
+  tagline varchar
+  description text [note: 'default meta description for SEO']
+  address varchar
+  phone varchar
+  email varchar
+  facebookUrl varchar
+  instagramUrl varchar
+  tiktokUrl varchar
+  youtubeUrl varchar
+  whatsappUrl varchar
+  mapEmbedUrl varchar [note: 'must start with https://www.google.com/maps/embed']
+  heroImage varchar [note: 'Cloudinary image URL']
+  bannerMessages varchar[] [note: 'max 10, rotate in homepage banner']
+  createdAt datetime
+  updatedAt datetime
+}

@@ -8,6 +8,7 @@ const links = [
   { href: "/admin/rooms", label: "Rooms" },
   { href: "/admin/menu", label: "Menu" },
   { href: "/admin/notices", label: "Notices" },
+  { href: "/admin/settings", label: "Settings" },
 ];
 
 export default function AdminNav() {

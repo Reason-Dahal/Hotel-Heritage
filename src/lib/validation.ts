@@ -30,3 +30,51 @@ export const noticeInputSchema = z.object({
   image: z.string().url().or(z.literal("")).optional(),
   active: z.boolean().optional(),
 });
+
+function isHttpUrl(value: string) {
+  try {
+    const { protocol } = new URL(value);
+    return protocol === "http:" || protocol === "https:";
+  } catch {
+    return false;
+  }
+}
+
+const optionalHttpUrl = z
+  .string()
+  .trim()
+  .refine(
+    (v) => v === "" || isHttpUrl(v),
+    "Must be a valid link starting with http:// or https://"
+  );
+
+export const siteSettingsInputSchema = z.object({
+  hotelName: z.string().trim().min(1, "Hotel name is required").max(100),
+  tagline: z.string().trim().max(160).optional(),
+  description: z.string().trim().max(500).optional(),
+  address: z.string().trim().max(300).optional(),
+  phone: z.string().trim().max(40).optional(),
+  email: z
+    .string()
+    .trim()
+    .refine(
+      (v) => v === "" || z.string().email().safeParse(v).success,
+      "Enter a valid email address"
+    )
+    .optional(),
+  facebookUrl: optionalHttpUrl.optional(),
+  instagramUrl: optionalHttpUrl.optional(),
+  tiktokUrl: optionalHttpUrl.optional(),
+  youtubeUrl: optionalHttpUrl.optional(),
+  whatsappUrl: optionalHttpUrl.optional(),
+  mapEmbedUrl: z
+    .string()
+    .trim()
+    .refine(
+      (v) => v === "" || v.startsWith("https://www.google.com/maps/embed"),
+      "Use the Google Maps 'Embed a map' link"
+    )
+    .optional(),
+  heroImage: optionalHttpUrl.optional(),
+  bannerMessages: z.array(z.string().trim().min(1).max(200)).max(10).optional(),
+});

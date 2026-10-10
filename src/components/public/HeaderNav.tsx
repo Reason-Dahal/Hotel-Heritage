@@ -65,8 +65,8 @@ export default function HeaderNav() {
                 aria-current={active ? "page" : undefined}
                 className={`block px-3 py-2 text-sm font-medium md:py-3 ${
                   active
-                    ? "text-amber-700"
-                    : "text-gray-700 hover:text-amber-700"
+                    ? "text-brand-700"
+                    : "text-gray-700 hover:text-brand-700"
                 }`}
               >
                 {label}

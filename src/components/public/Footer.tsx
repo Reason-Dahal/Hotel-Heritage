@@ -17,7 +17,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
   const hasContact = address || phone || email;
 
   return (
-    <footer id="contact" className="mt-16 bg-gray-900 text-gray-300">
+    <footer id="contact" className="mt-16 bg-ink-900 text-gray-300">
       <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
         <div>
           <p className="text-lg font-semibold text-white">{hotelName}</p>

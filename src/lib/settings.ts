@@ -24,5 +24,6 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsDTO> => {
     mapEmbedUrl: doc.mapEmbedUrl ?? "",
     heroImage: doc.heroImage ?? "",
     bannerMessages: doc.bannerMessages ?? [],
+    currency: doc.currency || DEFAULT_SETTINGS.currency,
   };
 });

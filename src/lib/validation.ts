@@ -77,4 +77,5 @@ export const siteSettingsInputSchema = z.object({
     .optional(),
   heroImage: optionalHttpUrl.optional(),
   bannerMessages: z.array(z.string().trim().min(1).max(200)).max(10).optional(),
+  currency: z.string().trim().regex(/^[A-Z]{3}$/, "Choose a currency from the list").optional(),
 });

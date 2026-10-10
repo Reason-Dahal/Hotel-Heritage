@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import Room from "@/models/Room";
 import { roomInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 export async function PUT(
 
@@ -32,7 +33,7 @@ export async function PUT(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, room });
   } catch (error) {
     console.error(error);
@@ -60,7 +61,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, message: "Room deleted" });
   } catch (error) {
     console.error(error);

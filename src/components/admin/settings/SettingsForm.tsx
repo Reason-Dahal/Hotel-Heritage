@@ -2,10 +2,10 @@
 
 import { useState, type ComponentProps } from "react";
 import { useAdminCrud } from "@/hooks/useAdminCrud";
-import { TextField, TextAreaField } from "@/components/admin/FormFields";
+import { TextField, TextAreaField, SelectField } from "@/components/admin/FormFields";
 import ImageListEditor from "@/components/admin/ImageListEditor";
 import { extractMapSrc } from "@/lib/mapEmbed";
-import type { SiteSettingsDTO } from "@/types/settings";
+import { SiteSettingsDTO,CURRENCY_OPTIONS } from "@/types/settings";
 import FormSection from "./FormSection";
 import BannerMessagesEditor from "./BannerMessagesEditor";
 
@@ -80,6 +80,13 @@ export default function SettingsForm({ settings }: { settings: SiteSettingsDTO }
           className="sm:col-span-2"
           value={form.description}
           onChange={(e) => setField("description", e.target.value)}
+        />
+                <SelectField
+          id="settings-currency"
+          label="Currency for prices"
+          options={CURRENCY_OPTIONS}
+          value={form.currency}
+          onChange={(e) => setField("currency", e.target.value)}
         />
       </FormSection>
 

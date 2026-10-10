@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import MenuItem from "@/models/MenuItem";
 import { menuItemInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 export async function GET() {
   try {
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
     }
 
     const item = await MenuItem.create(parsed.data);
+    revalidatePublicSite();
     return NextResponse.json({ success: true, item }, { status: 201 });
   } catch (error) {
     console.error(error);

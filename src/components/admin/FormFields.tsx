@@ -1,4 +1,4 @@
-import type { InputHTMLAttributes, TextareaHTMLAttributes } from "react";
+import type { InputHTMLAttributes, TextareaHTMLAttributes , SelectHTMLAttributes} from "react";
 
 const labelClass = "mb-1 block text-sm font-medium text-gray-700";
 const inputClass = "w-full rounded border border-gray-300 p-2";
@@ -48,6 +48,25 @@ export function CheckboxField({
         {label}
       </label>
       {hint && <p className="mt-1 text-xs text-gray-500">{hint}</p>}
+    </div>
+  );
+}
+
+type SelectFieldProps = {
+  label: string;
+  id: string;
+  options: { value: string; label: string }[];
+} & SelectHTMLAttributes<HTMLSelectElement>;
+
+export function SelectField({ label, id, options, className = "", ...props }: SelectFieldProps) {
+  return (
+    <div className={className}>
+      <label htmlFor={id} className={labelClass}>{label}</label>
+      <select id={id} className={inputClass} {...props}>
+        {options.map((o) => (
+          <option key={o.value} value={o.value}>{o.label}</option>
+        ))}
+      </select>
     </div>
   );
 }

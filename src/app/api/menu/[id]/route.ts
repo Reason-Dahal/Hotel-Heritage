@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import MenuItem from "@/models/MenuItem";
 import { menuItemInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 export async function PUT(
   request: Request,
@@ -31,7 +32,7 @@ export async function PUT(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, item });
   } catch (error) {
     console.error(error);
@@ -59,7 +60,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, message: "Menu item deleted" });
   } catch (error) {
     console.error(error);

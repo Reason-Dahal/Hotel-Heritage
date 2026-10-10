@@ -13,6 +13,7 @@ export interface SiteSettingsDTO {
     mapEmbedUrl: string;
     heroImage: string;
     bannerMessages: string[];
+    currency: string;
   }
   
   // Used until the admin saves settings for the first time
@@ -31,4 +32,14 @@ export interface SiteSettingsDTO {
     mapEmbedUrl: "",
     heroImage: "",
     bannerMessages: [],
+    currency: "NPR",
   };
+
+  export const CURRENCY_OPTIONS: { value: string; label: string }[] = [
+    { value: "NPR", label: "Nepalese rupee (NPR)" },
+    { value: "INR", label: "Indian rupee (INR)" },
+    { value: "USD", label: "US dollar (USD)" },
+    { value: "EUR", label: "Euro (EUR)" },
+    { value: "GBP", label: "British pound (GBP)" },
+    { value: "AUD", label: "Australian dollar (AUD)" },
+  ];

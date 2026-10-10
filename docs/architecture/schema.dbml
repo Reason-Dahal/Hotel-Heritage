@@ -76,4 +76,5 @@ Table site_settings {
   bannerMessages varchar[] [note: 'max 10, rotate in homepage banner']
   createdAt datetime
   updatedAt datetime
+  currency varchar [default: 'NPR', note: 'ISO 4217 code used to format public prices']
 }

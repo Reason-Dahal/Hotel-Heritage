@@ -13,6 +13,7 @@ Table rooms {
   price decimal [not null, note: 'base price per night, in local currency']
   discountPercent int [default: 0, note: '0-100, admin controlled']
   capacity int [note: 'max guests']
+  featured boolean [default: false, note: 'shown in homepage slideshow']
   createdAt datetime [default: `now()`]
   updatedAt datetime
 
@@ -27,6 +28,7 @@ Table menu_items {
   category varchar [note: 'e.g. "Signature Dish", "Starter", "Dessert"']
   price decimal [not null]
   discountPercent int [default: 0, note: '0-100, admin controlled']
+  featured boolean [default: false, note: 'shown in homepage slideshow']
   createdAt datetime [default: `now()`]
   updatedAt datetime
 

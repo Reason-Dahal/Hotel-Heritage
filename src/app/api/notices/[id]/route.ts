@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import Notice from "@/models/Notice";
 import { noticeInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 export async function PATCH(
   request: Request,
@@ -31,7 +32,7 @@ export async function PATCH(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, notice });
   } catch (error) {
     console.error(error);
@@ -59,7 +60,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
-
+    revalidatePublicSite();
     return NextResponse.json({ success: true, message: "Notice deleted" });
   } catch (error) {
     console.error(error);

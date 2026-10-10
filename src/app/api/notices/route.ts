@@ -3,6 +3,7 @@ import connectDB from "@/lib/db";
 import Notice from "@/models/Notice";
 import { noticeInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
+import { revalidatePublicSite } from "@/lib/revalidate";
 
 export async function GET() {
   try {
@@ -34,6 +35,7 @@ export async function POST(request: Request) {
     }
 
     const notice = await Notice.create(parsed.data);
+    revalidatePublicSite();
     return NextResponse.json({ success: true, notice }, { status: 201 });
   } catch (error) {
     console.error(error);

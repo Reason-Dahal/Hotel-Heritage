@@ -22,6 +22,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     mapEmbedUrl: { type: String, default: "" },
     heroImage: { type: String, default: "" },
     bannerMessages: { type: [String], default: [] },
+    currency: { type: String, default: "NPR" },
   },
   { timestamps: true }
 );

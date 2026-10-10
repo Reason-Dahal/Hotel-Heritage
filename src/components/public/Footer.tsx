@@ -18,7 +18,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
 
   return (
     <footer id="contact" className="mt-16 bg-ink-900 text-gray-300">
-      <div className="mx-auto grid max-w-6xl gap-8 px-4 py-10 md:grid-cols-3">
+     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-3">
         <div>
           <p className="text-lg font-semibold text-white">{hotelName}</p>
           {tagline && <p className="mt-1 text-sm">{tagline}</p>}
@@ -32,7 +32,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
             <h2 className="text-sm font-semibold uppercase tracking-wider text-white">
               Contact
             </h2>
-            <address className="mt-3 space-y-2 text-sm not-italic">
+            <address className="mt-3 space-y-2 break-words text-sm not-italic">
               {address && <p>{address}</p>}
               {phone && (
                 <p>

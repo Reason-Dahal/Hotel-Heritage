@@ -2,7 +2,19 @@ import Image from "next/image";
 import Price from "./Price";
 import type { MenuItemDTO } from "@/types/content";
 
-export default function DishCard({ item, currency }: { item: MenuItemDTO; currency: string }) {
+interface Props {
+  item: MenuItemDTO;
+  currency: string;
+  sizes?: string;
+  expanded?: boolean;
+}
+
+export default function DishCard({
+  item,
+  currency,
+  sizes = "(min-width: 640px) 320px, 288px",
+  expanded = false,
+}: Props) {
   return (
     <article className="flex h-full flex-col overflow-hidden rounded-lg border border-gray-200 bg-white">
       <div className="relative aspect-[4/3] bg-gray-100">
@@ -11,7 +23,7 @@ export default function DishCard({ item, currency }: { item: MenuItemDTO; curren
             src={item.images[0]}
             alt={item.name}
             fill
-            sizes="(min-width: 640px) 320px, 288px"
+            sizes={sizes}
             className="object-cover"
           />
         ) : (
@@ -28,10 +40,18 @@ export default function DishCard({ item, currency }: { item: MenuItemDTO; curren
         )}
         <h3 className="mt-1 text-lg font-semibold text-gray-900">{item.name}</h3>
         {item.description && (
-          <p className="mt-1 line-clamp-2 text-sm text-gray-600">{item.description}</p>
+          <p
+            className={`mt-1 text-sm text-gray-600 ${expanded ? "" : "line-clamp-2"}`}
+          >
+            {item.description}
+          </p>
         )}
         <div className="mt-auto pt-3">
-          <Price price={item.price} discountPercent={item.discountPercent} currency={currency} />
+          <Price
+            price={item.price}
+            discountPercent={item.discountPercent}
+            currency={currency}
+          />
         </div>
       </div>
     </article>

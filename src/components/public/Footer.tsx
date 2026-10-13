@@ -7,9 +7,9 @@ const SOCIALS = [
   { key: "youtubeUrl", label: "YouTube" },
   { key: "whatsappUrl", label: "WhatsApp" },
 ] as const;
+import { telHref } from "@/lib/contact";
 
-// Keep digits and a leading + only, so the tel: link always works
-const telHref = (phone: string) => `tel:${phone.replace(/[^\d+]/g, "")}`;
+
 
 export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
   const { hotelName, tagline, description, address, phone, email } = settings;

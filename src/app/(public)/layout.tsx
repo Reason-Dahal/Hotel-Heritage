@@ -1,8 +1,10 @@
 import Header from "@/components/public/Header";
 import Footer from "@/components/public/Footer";
+import NoticePopup from "@/components/public/NoticePopup";
 import { getSiteSettings } from "@/lib/settings";
+import { getActiveNotices } from "@/lib/content";
 
-// Safety net: refresh at least hourly. Saving settings refreshes it instantly.
+// Safety net: refresh at least hourly. Editing notices or settings refreshes it instantly.
 export const revalidate = 3600;
 
 export default async function PublicLayout({
@@ -10,7 +12,10 @@ export default async function PublicLayout({
 }: {
   children: React.ReactNode;
 }) {
-  const settings = await getSiteSettings();
+  const [settings, notices] = await Promise.all([
+    getSiteSettings(),
+    getActiveNotices(),
+  ]);
 
   return (
     <>
@@ -25,6 +30,7 @@ export default async function PublicLayout({
         {children}
       </main>
       <Footer settings={settings} />
+      <NoticePopup notices={notices} />
     </>
   );
 }

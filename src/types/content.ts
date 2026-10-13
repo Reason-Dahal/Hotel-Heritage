@@ -19,3 +19,11 @@ export interface RoomDTO {
     discountPercent: number;
     featured: boolean;
   }
+
+  export interface PublicNotice {
+    _id: string;
+    title: string;
+    message: string;
+    image: string;
+    key: string; // changes whenever the notice is edited, so edited notices show again
+  }

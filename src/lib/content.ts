@@ -1,7 +1,8 @@
 import connectDB from "@/lib/db";
 import Room, { type IRoom } from "@/models/Room";
 import MenuItem, { type IMenuItem } from "@/models/MenuItem";
-import type { RoomDTO, MenuItemDTO } from "@/types/content";
+import type { RoomDTO, MenuItemDTO, PublicNotice  } from "@/types/content";
+import Notice from "@/models/Notice";
 
 const FEATURED_LIMIT = 8;
 
@@ -94,4 +95,30 @@ export function groupMenuByCategory(items: MenuItemDTO[]): MenuSection[] {
   return [...groups.entries()]
     .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
     .map(([, group], i) => ({ id: `menu-section-${i}`, ...group }));
+}
+
+const NOTICE_LIMIT = 5;
+
+export async function getActiveNotices(): Promise<PublicNotice[]> {
+  await connectDB();
+  const docs = await Notice.find({ active: true })
+    .sort({ createdAt: -1 })
+    .limit(NOTICE_LIMIT)
+    .lean();
+
+  return docs.map(
+    (n: {
+      _id: unknown;
+      title: string;
+      message: string;
+      image?: string;
+      updatedAt?: Date;
+    }) => ({
+      _id: String(n._id),
+      title: n.title,
+      message: n.message,
+      image: n.image ?? "",
+      key: `${String(n._id)}:${n.updatedAt ? new Date(n.updatedAt).getTime() : 0}`,
+    })
+  );
 }

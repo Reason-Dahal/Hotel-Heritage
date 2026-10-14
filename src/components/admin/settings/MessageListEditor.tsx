@@ -3,28 +3,33 @@
 const MAX_MESSAGES = 10;
 
 interface Props {
+  label: string;
+  hint?: string;
+  addLabel: string;
   messages: string[];
   onChange: (messages: string[]) => void;
 }
 
-export default function BannerMessagesEditor({ messages, onChange }: Props) {
+export default function MessageListEditor({
+  label,
+  hint,
+  addLabel,
+  messages,
+  onChange,
+}: Props) {
   const update = (index: number, value: string) =>
     onChange(messages.map((m, i) => (i === index ? value : m)));
 
   return (
     <div>
-      <p className="mb-1 block text-sm font-medium text-gray-700">
-        Banner messages
-      </p>
-      <p className="mb-2 text-xs text-gray-500">
-        Short messages that rotate in the banner under the hero image.
-      </p>
+      <p className="mb-1 block text-sm font-medium text-gray-700">{label}</p>
+      {hint && <p className="mb-2 text-xs text-gray-500">{hint}</p>}
 
       <ul className="space-y-2">
         {messages.map((message, i) => (
           <li key={i} className="flex gap-2">
             <input
-              aria-label={`Banner message ${i + 1}`}
+              aria-label={`${label} ${i + 1}`}
               maxLength={200}
               value={message}
               onChange={(e) => update(i, e.target.value)}
@@ -47,7 +52,7 @@ export default function BannerMessagesEditor({ messages, onChange }: Props) {
           onClick={() => onChange([...messages, ""])}
           className="mt-2 text-sm text-blue-600 hover:underline"
         >
-          Add message
+          {addLabel}
         </button>
       )}
     </div>

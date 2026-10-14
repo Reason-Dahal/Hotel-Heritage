@@ -33,3 +33,5 @@ to Google Maps embed URLs only, because these values are rendered into
 - Negative: public pages now depend on one extra database read (mitigated
   by per-request caching and `revalidatePath`); the app needs a sensible
   default when no settings document exists yet (`DEFAULT_SETTINGS`).
+
+- The WhatsApp contact is stored as a normalized number (digits with country code) rather than a link, so every link and pre-filled message is built from a single value.

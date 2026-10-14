@@ -48,10 +48,20 @@ const optionalHttpUrl = z
     "Must be a valid link starting with http:// or https://"
   );
 
+  const messageList = z
+  .array(z.string().trim().min(1).max(200))
+  .max(10)
+  .optional();
+
 export const siteSettingsInputSchema = z.object({
   hotelName: z.string().trim().min(1, "Hotel name is required").max(100),
   tagline: z.string().trim().max(160).optional(),
   description: z.string().trim().max(500).optional(),
+  currency: z
+    .string()
+    .trim()
+    .regex(/^[A-Z]{3}$/, "Choose a currency from the list")
+    .optional(),
   address: z.string().trim().max(300).optional(),
   phone: z.string().trim().max(40).optional(),
   email: z
@@ -62,11 +72,20 @@ export const siteSettingsInputSchema = z.object({
       "Enter a valid email address"
     )
     .optional(),
+  // Spaces, dashes, brackets, and + are stripped, so "+977 98-1234-5678" is accepted
+  whatsappNumber: z
+    .string()
+    .trim()
+    .transform((v) => v.replace(/[\s\-().+]/g, ""))
+    .refine(
+      (v) => v === "" || /^\d{8,15}$/.test(v),
+      "Enter the WhatsApp number with country code, 8 to 15 digits"
+    )
+    .optional(),
   facebookUrl: optionalHttpUrl.optional(),
   instagramUrl: optionalHttpUrl.optional(),
   tiktokUrl: optionalHttpUrl.optional(),
   youtubeUrl: optionalHttpUrl.optional(),
-  whatsappUrl: optionalHttpUrl.optional(),
   mapEmbedUrl: z
     .string()
     .trim()
@@ -76,6 +95,7 @@ export const siteSettingsInputSchema = z.object({
     )
     .optional(),
   heroImage: optionalHttpUrl.optional(),
-  bannerMessages: z.array(z.string().trim().min(1).max(200)).max(10).optional(),
-  currency: z.string().trim().regex(/^[A-Z]{3}$/, "Choose a currency from the list").optional(),
+  heroSubtitle: z.string().trim().max(160).optional(),
+  bannerMessages: messageList,
+  tickerMessages: messageList,
 });

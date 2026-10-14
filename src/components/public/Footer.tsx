@@ -1,24 +1,29 @@
 import type { SiteSettingsDTO } from "@/types/settings";
+import { telHref, whatsappHref } from "@/lib/contact";
 
 const SOCIALS = [
   { key: "facebookUrl", label: "Facebook" },
   { key: "instagramUrl", label: "Instagram" },
   { key: "tiktokUrl", label: "TikTok" },
   { key: "youtubeUrl", label: "YouTube" },
-  { key: "whatsappUrl", label: "WhatsApp" },
 ] as const;
-import { telHref } from "@/lib/contact";
-
-
 
 export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
-  const { hotelName, tagline, description, address, phone, email } = settings;
+  const {
+    hotelName,
+    tagline,
+    description,
+    address,
+    phone,
+    email,
+    whatsappNumber,
+  } = settings;
   const socials = SOCIALS.filter(({ key }) => settings[key]);
-  const hasContact = address || phone || email;
+  const hasContact = address || phone || email || whatsappNumber;
 
   return (
-    <footer id="contact" className="mt-16 bg-ink-900 text-gray-300">
-     <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-3">
+    <footer id="contact" className="mt-16 bg-ink text-gray-300">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-3">
         <div>
           <p className="text-lg font-semibold text-white">{hotelName}</p>
           {tagline && <p className="mt-1 text-sm">{tagline}</p>}
@@ -45,6 +50,19 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
                 <p>
                   <a href={`mailto:${email}`} className="hover:text-white">
                     {email}
+                  </a>
+                </p>
+              )}
+              {whatsappNumber && (
+                <p>
+                  <a
+                    href={whatsappHref(whatsappNumber)}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="hover:text-white"
+                  >
+                    Chat on WhatsApp
+                    <span className="sr-only"> (opens in a new tab)</span>
                   </a>
                 </p>
               )}

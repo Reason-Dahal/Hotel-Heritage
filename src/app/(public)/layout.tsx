@@ -25,7 +25,7 @@ export default async function PublicLayout({
       >
         Skip to content
       </a>
-      <Header hotelName={settings.hotelName} tagline={settings.tagline} />
+      <Header hotelName={settings.hotelName} tickerMessages={settings.tickerMessages} />
       <main id="main" className="flex-1">
         {children}
       </main>

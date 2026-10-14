@@ -25,6 +25,44 @@
   --font-mono: var(--font-geist-mono);
 }
 
+/* Header news ticker: two identical groups both slide left by one group width,
+   then the loop restarts. The layouts are identical at that point, so it is seamless. */
+   @keyframes ticker-scroll {
+    from {
+      transform: translateX(0);
+    }
+    to {
+      transform: translateX(-100%);
+    }
+  }
+  
+  .ticker-group {
+    animation: ticker-scroll var(--ticker-duration, 30s) linear infinite;
+    will-change: transform;
+  }
+  
+  .ticker[data-paused="true"] .ticker-group {
+    animation-play-state: paused;
+  }
+  
+  /* Hover-pause only on devices with a real pointer, so a tap on a phone
+     doesn't leave the ticker stuck in "hovered" state */
+  @media (hover: hover) {
+    .ticker:hover .ticker-group {
+      animation-play-state: paused;
+    }
+  }
+  
+  .ticker:focus-within .ticker-group {
+    animation-play-state: paused;
+  }
+  
+  @media (prefers-reduced-motion: reduce) {
+    .ticker-group {
+      animation: none;
+    }
+  }
+
 html { scroll-behavior: smooth; }
 
 body {

@@ -2,11 +2,11 @@ import Image from "next/image";
 
 interface Props {
   hotelName: string;
-  tagline: string;
+  subtitle: string;
   image: string;
 }
 
-export default function Hero({ hotelName, tagline, image }: Props) {
+export default function Hero({ hotelName, subtitle, image }: Props) {
   return (
     <section className="relative isolate flex h-[60vh] max-h-[640px] min-h-80 items-center justify-center overflow-hidden bg-ink">
       {image && (
@@ -28,8 +28,8 @@ export default function Hero({ hotelName, tagline, image }: Props) {
         <h1 className="text-4xl font-bold tracking-wide md:text-6xl">
           {hotelName}
         </h1>
-        {tagline && (
-          <p className="mt-3 text-lg text-gray-100 md:text-xl">{tagline}</p>
+        {subtitle && (
+          <p className="mt-3 text-lg text-gray-100 md:text-xl">{subtitle}</p>
         )}
       </div>
     </section>

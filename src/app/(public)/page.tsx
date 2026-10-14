@@ -24,7 +24,7 @@ export default async function HomePage() {
     <>
       <Hero
         hotelName={settings.hotelName}
-        tagline={settings.tagline}
+        subtitle={settings.heroSubtitle}
         image={settings.heroImage}
       />
 

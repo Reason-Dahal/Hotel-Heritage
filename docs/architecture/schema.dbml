@@ -70,7 +70,11 @@ Table site_settings {
   instagramUrl varchar
   tiktokUrl varchar
   youtubeUrl varchar
-  whatsappUrl varchar
+  
+  whatsappNumber varchar [note: 'digits only with country code, e.g. 9779812345678; builds wa.me links']
+  heroSubtitle varchar [note: 'text on the homepage main photo; separate from tagline']
+  tickerMessages varchar[] [note: 'max 10, moving messages in the header']
+
   mapEmbedUrl varchar [note: 'must start with https://www.google.com/maps/embed']
   heroImage varchar [note: 'Cloudinary image URL']
   bannerMessages varchar[] [note: 'max 10, rotate in homepage banner']

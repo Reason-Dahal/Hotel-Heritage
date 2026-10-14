@@ -32,23 +32,6 @@ export default async function HomePage() {
         <MessageBanner messages={settings.bannerMessages} />
       )}
 
-      {dishes.length > 0 && (
-        <FeaturedSection
-          id="signature-dishes"
-          title="Our signature dishes"
-          seeAllHref="/menu"
-          seeAllLabel="See full menu"
-        >
-          <Carousel label="signature dishes">
-            {dishes.map((item) => (
-              <li key={item._id} className={slideClass}>
-                <DishCard item={item} currency={settings.currency} />
-              </li>
-            ))}
-          </Carousel>
-        </FeaturedSection>
-      )}
-
       {rooms.length > 0 && (
         <FeaturedSection
           id="featured-rooms"
@@ -60,6 +43,23 @@ export default async function HomePage() {
             {rooms.map((room) => (
               <li key={room._id} className={slideClass}>
                 <RoomCard room={room} currency={settings.currency} />
+              </li>
+            ))}
+          </Carousel>
+        </FeaturedSection>
+      )}
+
+      {dishes.length > 0 && (
+        <FeaturedSection
+          id="signature-dishes"
+          title="Our signature dishes"
+          seeAllHref="/menu"
+          seeAllLabel="See full menu"
+        >
+          <Carousel label="signature dishes">
+            {dishes.map((item) => (
+              <li key={item._id} className={slideClass}>
+                <DishCard item={item} currency={settings.currency} />
               </li>
             ))}
           </Carousel>

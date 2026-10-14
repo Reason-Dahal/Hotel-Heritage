@@ -31,13 +31,25 @@ export default function MessageBanner({ messages }: { messages: string[] }) {
       onBlur={() => setPaused(false)}
       className="border-y border-brand-100 bg-brand-50"
     >
-      <div className="mx-auto max-w-6xl px-4 py-3 text-center">
-        <p className="text-sm font-medium text-brand-800 md:text-base">
-          {messages[current]}
-        </p>
+      <div className="mx-auto max-w-6xl px-4 py-5 text-center md:py-7">
+        {/* All messages share one grid cell, so the banner is always as tall
+            as the longest message and the page below never jumps */}
+       <div className="grid grid-cols-1">
+          {messages.map((message, i) => (
+            <p
+            key={i}
+            className={`col-start-1 row-start-1 break-words text-center text-lg font-semibold text-brand-800 md:text-2xl ${
+              i === current ? "" : "invisible"
+            }`}
+          >
+            {message}
+          </p>
+
+          ))}
+        </div>
 
         {messages.length > 1 && (
-          <div className="mt-1 flex justify-center">
+          <div className="mt-2 flex justify-center">
             {messages.map((_, i) => (
               <button
                 key={i}
@@ -48,7 +60,7 @@ export default function MessageBanner({ messages }: { messages: string[] }) {
                 className="p-2"
               >
                 <span
-                  className={`block h-2 w-2 rounded-full ${
+                  className={`block h-2.5 w-2.5 rounded-full ${
                     i === current ? "bg-brand-700" : "bg-brand-400/50"
                   }`}
                 />

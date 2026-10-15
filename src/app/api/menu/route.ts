@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import MenuItem from "@/models/MenuItem";
+import Category from "@/models/Category";
 import { menuItemInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublicSite } from "@/lib/revalidate";
@@ -22,6 +23,7 @@ export async function GET() {
 export async function POST(request: Request) {
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
+
   try {
     await connectDB();
     const body = await request.json();
@@ -30,6 +32,14 @@ export async function POST(request: Request) {
     if (!parsed.success) {
       return NextResponse.json(
         { success: false, error: parsed.error.flatten().fieldErrors },
+        { status: 400 }
+      );
+    }
+
+    const { categoryId } = parsed.data;
+    if (categoryId && !(await Category.exists({ _id: categoryId }))) {
+      return NextResponse.json(
+        { success: false, error: { categoryId: ["That category no longer exists"] } },
         { status: 400 }
       );
     }

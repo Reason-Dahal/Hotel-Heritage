@@ -19,6 +19,8 @@ interface Options {
   singleton?: boolean;
 }
 
+const JSON_HEADERS = { "Content-Type": "application/json" };
+
 export function useAdminCrud(endpoint: string, options: Options = {}) {
   const { updateMethod = "PUT", singleton = false } = options;
   const router = useRouter();
@@ -54,7 +56,7 @@ export function useAdminCrud(endpoint: string, options: Options = {}) {
     setSaving(true);
     const ok = await request(singleton || !id ? endpoint : `${endpoint}/${id}`, {
       method: singleton ? "PUT" : id ? updateMethod : "POST",
-      headers: { "Content-Type": "application/json" },
+      headers: JSON_HEADERS,
       body: JSON.stringify(payload),
     });
     setSaving(false);
@@ -69,6 +71,19 @@ export function useAdminCrud(endpoint: string, options: Options = {}) {
     return ok;
   }
 
+  // One-off POST to a sub-path of the endpoint, such as /reorder
+  async function action(path: string, payload: unknown): Promise<boolean> {
+    setError("");
+    setSaving(true);
+    const ok = await request(`${endpoint}${path}`, {
+      method: "POST",
+      headers: JSON_HEADERS,
+      body: JSON.stringify(payload),
+    });
+    setSaving(false);
+    return ok;
+  }
+
   return {
     saving,
     deletingId,
@@ -76,5 +91,6 @@ export function useAdminCrud(endpoint: string, options: Options = {}) {
     clearError: () => setError(""),
     save,
     remove,
+    action,
   };
 }

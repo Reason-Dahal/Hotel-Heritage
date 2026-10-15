@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import connectDB from "@/lib/db";
 import MenuItem from "@/models/MenuItem";
+import Category from "@/models/Category";
 import { menuItemInputSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublicSite } from "@/lib/revalidate";
@@ -11,6 +12,7 @@ export async function PUT(
 ) {
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
+
   try {
     await connectDB();
     const { id } = await params;
@@ -24,14 +26,22 @@ export async function PUT(
       );
     }
 
-    const item = await MenuItem.findByIdAndUpdate(id, parsed.data, { new: true });
+    const { categoryId } = parsed.data;
+    if (categoryId && !(await Category.exists({ _id: categoryId }))) {
+      return NextResponse.json(
+        { success: false, error: { categoryId: ["That category no longer exists"] } },
+        { status: 400 }
+      );
+    }
 
+    const item = await MenuItem.findByIdAndUpdate(id, parsed.data, { new: true });
     if (!item) {
       return NextResponse.json(
         { success: false, error: "Menu item not found" },
         { status: 404 }
       );
     }
+
     revalidatePublicSite();
     return NextResponse.json({ success: true, item });
   } catch (error) {
@@ -49,6 +59,7 @@ export async function DELETE(
 ) {
   const unauthorized = await requireAdmin();
   if (unauthorized) return unauthorized;
+
   try {
     await connectDB();
     const { id } = await params;
@@ -60,6 +71,7 @@ export async function DELETE(
         { status: 404 }
       );
     }
+
     revalidatePublicSite();
     return NextResponse.json({ success: true, message: "Menu item deleted" });
   } catch (error) {

@@ -1,10 +1,22 @@
 import connectDB from "@/lib/db";
 import Room, { type IRoom } from "@/models/Room";
 import MenuItem, { type IMenuItem } from "@/models/MenuItem";
-import type { RoomDTO, MenuItemDTO, PublicNotice  } from "@/types/content";
+import Category from "@/models/Category";
 import Notice from "@/models/Notice";
+import type {
+  RoomDTO,
+  MenuItemDTO,
+  CategoryDTO,
+  PublicNotice,
+} from "@/types/content";
 
 const FEATURED_LIMIT = 8;
+const NOTICE_LIMIT = 5;
+
+type LeanMenuItem = Omit<IMenuItem, "categoryId"> & {
+  _id: unknown;
+  categoryId?: { _id: unknown; name: string } | null; // populated
+};
 
 function toRoomDTO(r: IRoom & { _id: unknown }): RoomDTO {
   return {
@@ -19,13 +31,14 @@ function toRoomDTO(r: IRoom & { _id: unknown }): RoomDTO {
   };
 }
 
-function toMenuItemDTO(m: IMenuItem & { _id: unknown }): MenuItemDTO {
+export function toMenuItemDTO(m: LeanMenuItem): MenuItemDTO {
   return {
     _id: String(m._id),
     name: m.name,
     description: m.description ?? "",
     images: m.images ?? [],
-    category: m.category ?? "",
+    categoryId: m.categoryId ? String(m.categoryId._id) : "",
+    category: m.categoryId?.name ?? "",
     price: m.price,
     discountPercent: m.discountPercent ?? 0,
     featured: m.featured ?? false,
@@ -35,6 +48,7 @@ function toMenuItemDTO(m: IMenuItem & { _id: unknown }): MenuItemDTO {
 export async function getFeaturedMenuItems(): Promise<MenuItemDTO[]> {
   await connectDB();
   const docs = await MenuItem.find({ featured: true })
+    .populate("categoryId", "name")
     .sort({ createdAt: -1 })
     .limit(FEATURED_LIMIT)
     .lean();
@@ -53,6 +67,7 @@ export async function getFeaturedRooms(): Promise<RoomDTO[]> {
 export async function getAllMenuItems(): Promise<MenuItemDTO[]> {
   await connectDB();
   const docs = await MenuItem.find({})
+    .populate("categoryId", "name")
     .sort({ featured: -1, createdAt: -1 })
     .lean();
   return docs.map((m) => toMenuItemDTO(m));
@@ -66,38 +81,72 @@ export async function getAllRooms(): Promise<RoomDTO[]> {
   return docs.map((r) => toRoomDTO(r));
 }
 
+// Categories in the order the admin chose
+export async function getMenuCategories(): Promise<CategoryDTO[]> {
+  await connectDB();
+  const docs = await Category.find({}).sort({ sortOrder: 1, name: 1 }).lean();
+  return docs.map((c) => ({
+    _id: String(c._id),
+    name: c.name,
+    sortOrder: c.sortOrder ?? 0,
+  }));
+}
+
+// Same list, plus how many menu items use each (for the admin page)
+export async function getCategoriesWithCounts(): Promise<CategoryDTO[]> {
+  const [categories, counts] = await Promise.all([
+    getMenuCategories(),
+    MenuItem.aggregate([
+      { $match: { categoryId: { $ne: null } } },
+      { $group: { _id: "$categoryId", count: { $sum: 1 } } },
+    ]),
+  ]);
+
+  const countById = new Map<string, number>(
+    counts.map((c: { _id: unknown; count: number }): [string, number] => [
+      String(c._id),
+      c.count,
+    ])
+  );
+  return categories.map((c) => ({ ...c, itemCount: countById.get(c._id) ?? 0 }));
+}
+
 export interface MenuSection {
   id: string;
   name: string;
   items: MenuItemDTO[];
 }
 
-// Classic menu order first, other categories alphabetically, "Other" last
-const CATEGORY_ORDER = ["starter", "main course", "dessert", "beverage"];
-
-export function groupMenuByCategory(items: MenuItemDTO[]): MenuSection[] {
-  const groups = new Map<string, { name: string; items: MenuItemDTO[] }>();
+// Sections follow the admin's category order. Empty categories are skipped,
+// and dishes without a category go last under "Other".
+export function groupMenuByCategory(
+  items: MenuItemDTO[],
+  categories: CategoryDTO[]
+): MenuSection[] {
+  const byCategory = new Map<string, MenuItemDTO[]>();
+  const uncategorized: MenuItemDTO[] = [];
 
   for (const item of items) {
-    const name = item.category.trim() || "Other";
-    const key = name.toLowerCase();
-    const group = groups.get(key);
-    if (group) group.items.push(item);
-    else groups.set(key, { name, items: [item] });
+    if (!item.categoryId) {
+      uncategorized.push(item);
+      continue;
+    }
+    const list = byCategory.get(item.categoryId) ?? [];
+    list.push(item);
+    byCategory.set(item.categoryId, list);
   }
 
-  const rank = (key: string) => {
-    if (key === "other") return 1000;
-    const i = CATEGORY_ORDER.indexOf(key);
-    return i === -1 ? 500 : i;
-  };
+  const sections: { name: string; items: MenuItemDTO[] }[] = [];
+  for (const category of categories) {
+    const list = byCategory.get(category._id);
+    if (list && list.length > 0) sections.push({ name: category.name, items: list });
+  }
+  if (uncategorized.length > 0) {
+    sections.push({ name: "Other", items: uncategorized });
+  }
 
-  return [...groups.entries()]
-    .sort(([a], [b]) => rank(a) - rank(b) || a.localeCompare(b))
-    .map(([, group], i) => ({ id: `menu-section-${i}`, ...group }));
+  return sections.map((s, i) => ({ id: `menu-section-${i}`, ...s }));
 }
-
-const NOTICE_LIMIT = 5;
 
 export async function getActiveNotices(): Promise<PublicNotice[]> {
   await connectDB();

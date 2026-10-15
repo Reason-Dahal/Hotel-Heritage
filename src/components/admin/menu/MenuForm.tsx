@@ -4,9 +4,11 @@ import { useState } from "react";
 import {
   TextField,
   TextAreaField,
+  SelectField,
   CheckboxField,
 } from "@/components/admin/FormFields";
 import ImageListEditor from "@/components/admin/ImageListEditor";
+import type { CategoryDTO } from "@/types/content";
 import type { MenuItemDTO } from "./types";
 
 export interface MenuItemPayload {
@@ -15,32 +17,33 @@ export interface MenuItemPayload {
   price: number;
   discountPercent: number;
   images: string[];
-  category?: string;
+  categoryId: string | null;
   featured: boolean;
 }
 
 interface Props {
   item: MenuItemDTO | null; // null = creating a new item
+  categories: CategoryDTO[];
   saving: boolean;
   error: string;
   onSubmit: (payload: MenuItemPayload) => void;
   onCancel: () => void;
 }
 
-type TextKey = "name" | "description" | "category" | "price" | "discountPercent";
+type TextKey = "name" | "description" | "price" | "discountPercent";
 
-const CATEGORY_SUGGESTIONS = [
-  "Starter",
-  "Main Course",
-  "Dessert",
-  "Beverage",
-];
-
-export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Props) {
+export default function MenuForm({
+  item,
+  categories,
+  saving,
+  error,
+  onSubmit,
+  onCancel,
+}: Props) {
   const [form, setForm] = useState({
     name: item?.name ?? "",
     description: item?.description ?? "",
-    category: item?.category ?? "",
+    categoryId: item?.categoryId ?? "",
     price: item ? String(item.price) : "",
     discountPercent: item ? String(item.discountPercent) : "0",
     images: item?.images ?? [],
@@ -50,6 +53,11 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
   const setField = (field: TextKey, value: string) =>
     setForm((prev) => ({ ...prev, [field]: value }));
 
+  const categoryOptions = [
+    { value: "", label: "No category" },
+    ...categories.map((c) => ({ value: c._id, label: c.name })),
+  ];
+
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     onSubmit({
@@ -58,7 +66,7 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
       price: Number(form.price),
       discountPercent: Number(form.discountPercent || 0),
       images: form.images,
-      ...(form.category.trim() ? { category: form.category.trim() } : {}),
+      categoryId: form.categoryId || null,
       featured: form.featured,
     });
   };
@@ -95,19 +103,30 @@ export default function MenuForm({ item, saving, error, onSubmit, onCancel }: Pr
           value={form.description}
           onChange={(e) => setField("description", e.target.value)}
         />
-        <TextField
-          id="menu-category"
-          label="Category"
-          list="menu-category-options"
-          placeholder="e.g. Main Course"
-          value={form.category}
-          onChange={(e) => setField("category", e.target.value)}
-        />
-        <datalist id="menu-category-options">
-          {CATEGORY_SUGGESTIONS.map((c) => (
-            <option key={c} value={c} />
-          ))}
-        </datalist>
+        <div>
+          <SelectField
+            id="menu-category"
+            label="Category"
+            options={categoryOptions}
+            value={form.categoryId}
+            onChange={(e) =>
+              setForm((prev) => ({ ...prev, categoryId: e.target.value }))
+            }
+          />
+          <p className="mt-1 text-xs text-gray-500">
+            Missing one?{" "}
+            <a
+              href="/admin/categories"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-blue-600 hover:underline"
+            >
+              Manage categories
+              <span className="sr-only"> (opens in a new tab)</span>
+            </a>
+            , then reload this page.
+          </p>
+        </div>
         <TextField
           id="menu-price"
           label="Price"

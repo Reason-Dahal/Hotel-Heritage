@@ -25,7 +25,7 @@ Table menu_items {
   name varchar [not null, note: 'e.g. "Grilled Salmon"']
   description text
   images varchar[] [note: 'array of Cloudinary image URLs']
-  category varchar [note: 'e.g. "Signature Dish", "Starter", "Dessert"']
+  categoryId ObjectId [ref: > categories._id, note: 'optional; null shows under "Other" on the public menu']
   price decimal [not null]
   discountPercent int [default: 0, note: '0-100, admin controlled']
   featured boolean [default: false, note: 'shown in homepage slideshow']
@@ -55,6 +55,16 @@ Table admins {
   updatedAt datetime
 
   Note: 'Single admin account for Phase 1. NextAuth Credentials provider reads from this collection.'
+}
+
+Table categories {
+  _id ObjectId [pk]
+  name varchar [not null, unique, note: 'unique ignoring capital letters']
+  sortOrder int [default: 0, note: 'display order on the public menu']
+  createdAt datetime
+  updatedAt datetime
+
+  Note: 'Managed from the admin Categories page. Cannot be deleted while menu items use it.'
 }
 
 Table site_settings {

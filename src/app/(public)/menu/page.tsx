@@ -1,8 +1,12 @@
 import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/settings";
-import { getAllMenuItems, groupMenuByCategory } from "@/lib/content";
 import PageHeader from "@/components/public/PageHeader";
 import DishCard from "@/components/public/DishCard";
+import {
+  getAllMenuItems,
+  getMenuCategories,
+  groupMenuByCategory,
+} from "@/lib/content";
 
 export const revalidate = 3600;
 
@@ -18,11 +22,13 @@ export async function generateMetadata(): Promise<Metadata> {
 }
 
 export default async function MenuPage() {
-  const [settings, items] = await Promise.all([
+  const [settings, items, categories] = await Promise.all([
     getSiteSettings(),
     getAllMenuItems(),
+    getMenuCategories(),
   ]);
-  const sections = groupMenuByCategory(items);
+  const sections = groupMenuByCategory(items, categories);
+
 
   return (
     <>

@@ -1,4 +1,5 @@
 import { z } from "zod";
+import { OBJECT_ID_PATTERN } from "@/lib/objectId";
 
 // Note: no .default() here on purpose. Mongoose applies defaults on create.
 // Defaults in Zod would also fire inside .partial() and overwrite stored
@@ -18,7 +19,11 @@ export const menuItemInputSchema = z.object({
   name: z.string().min(1, "Name is required"),
   description: z.string().optional(),
   images: z.array(z.string().url()).optional(),
-  category: z.string().optional(),
+  categoryId: z
+    .string()
+    .regex(OBJECT_ID_PATTERN, "Choose a valid category")
+    .nullable()
+    .optional(),
   price: z.number().positive("Price must be a positive number"),
   discountPercent: z.number().min(0).max(100).optional(),
   featured: z.boolean().optional(),
@@ -48,7 +53,7 @@ const optionalHttpUrl = z
     "Must be a valid link starting with http:// or https://"
   );
 
-  const messageList = z
+const messageList = z
   .array(z.string().trim().min(1).max(200))
   .max(10)
   .optional();
@@ -98,4 +103,12 @@ export const siteSettingsInputSchema = z.object({
   heroSubtitle: z.string().trim().max(160).optional(),
   bannerMessages: messageList,
   tickerMessages: messageList,
+});
+
+export const categoryInputSchema = z.object({
+  name: z.string().trim().min(1, "Name is required").max(60),
+});
+
+export const categoryReorderSchema = z.object({
+  orderedIds: z.array(z.string().regex(OBJECT_ID_PATTERN)).min(1).max(100),
 });

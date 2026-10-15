@@ -2,11 +2,17 @@
 
 import { useState } from "react";
 import { useAdminCrud } from "@/hooks/useAdminCrud";
+import type { CategoryDTO } from "@/types/content";
 import MenuForm, { type MenuItemPayload } from "./MenuForm";
 import MenuTable from "./MenuTable";
 import type { MenuItemDTO } from "./types";
 
-export default function MenuManager({ items }: { items: MenuItemDTO[] }) {
+interface Props {
+  items: MenuItemDTO[];
+  categories: CategoryDTO[];
+}
+
+export default function MenuManager({ items, categories }: Props) {
   const { saving, deletingId, error, clearError, save, remove } =
     useAdminCrud("/api/menu");
 
@@ -58,6 +64,7 @@ export default function MenuManager({ items }: { items: MenuItemDTO[] }) {
         <MenuForm
           key={editing === "new" ? "new" : editing._id}
           item={editing === "new" ? null : editing}
+          categories={categories}
           saving={saving}
           error={error}
           onSubmit={handleSave}

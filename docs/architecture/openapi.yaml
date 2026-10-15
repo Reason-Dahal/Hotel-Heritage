@@ -19,6 +19,7 @@ tags:
   - name: Notices
   - name: Auth
   - name: Settings
+  - name: Categories
 
 paths:
   /rooms:
@@ -180,6 +181,121 @@ paths:
           description: Not authenticated as admin
         "404":
           description: Menu item not found
+
+    /categories:
+    get:
+      tags: [Categories]
+      summary: List categories in display order
+      description: Public.
+      responses:
+        "200":
+          description: Ordered categories
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  $ref: "#/components/schemas/Category"
+    post:
+      tags: [Categories]
+      summary: Create a category
+      description: Admin only. Names are unique, ignoring capital letters.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "201":
+          description: Category created
+        "400":
+          description: Validation error
+        "401":
+          description: Not authenticated as admin
+        "409":
+          description: A category with that name already exists
+
+  /categories/{id}:
+    put:
+      tags: [Categories]
+      summary: Rename a category
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/CategoryInput"
+      responses:
+        "200":
+          description: Category renamed
+        "400":
+          description: Invalid id or validation error
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Category not found
+        "409":
+          description: A category with that name already exists
+    delete:
+      tags: [Categories]
+      summary: Delete a category
+      description: Admin only. Refused while menu items use the category.
+      security:
+        - adminSession: []
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        "200":
+          description: Category deleted
+        "401":
+          description: Not authenticated as admin
+        "404":
+          description: Category not found
+        "409":
+          description: Menu items still use this category
+
+  /categories/reorder:
+    post:
+      tags: [Categories]
+      summary: Set the display order of categories
+      description: Admin only. Send every category id in the desired order.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [orderedIds]
+              properties:
+                orderedIds:
+                  type: array
+                  items:
+                    type: string
+      responses:
+        "200":
+          description: Order saved
+        "400":
+          description: Validation error
+        "401":
+          description: Not authenticated as admin
 
   /notices:
     get:

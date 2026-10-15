@@ -3,11 +3,9 @@ import { getSiteSettings } from "@/lib/settings";
 import { getAllRooms } from "@/lib/content";
 import { telHref } from "@/lib/contact";
 import PageHeader from "@/components/public/PageHeader";
-import RoomCard from "@/components/public/RoomCard";
+import RoomsBrowser from "@/components/public/RoomsBrowser";
 
 export const revalidate = 3600;
-
-const GRID_SIZES = "(min-width: 1024px) 384px, (min-width: 640px) 50vw, 100vw";
 
 export async function generateMetadata(): Promise<Metadata> {
   const { hotelName } = await getSiteSettings();
@@ -29,31 +27,20 @@ export default async function RoomsPage() {
         intro="Comfortable stays with clear pricing. All prices are per night."
       />
 
-      <div className="mx-auto max-w-6xl px-4 py-10">
-        {rooms.length === 0 ? (
-          <p className="py-10 text-center text-gray-600">
-            Our rooms are coming soon. Please check back shortly.
-          </p>
-        ) : (
-          <>
-            <ul className="grid gap-6 sm:grid-cols-2 lg:grid-cols-3">
-              {rooms.map((room) => (
-                <li key={room._id}>
-                  <RoomCard
-                    room={room}
-                    currency={settings.currency}
-                    sizes={GRID_SIZES}
-                    expanded
-                  />
-                </li>
-              ))}
-            </ul>
+      {rooms.length === 0 ? (
+        <p className="mx-auto max-w-6xl px-4 py-16 text-center text-gray-600">
+          Our rooms are coming soon. Please check back shortly.
+        </p>
+      ) : (
+        <>
+          <RoomsBrowser rooms={rooms} currency={settings.currency} />
 
-            {(phone || email) && (
-              <section
-                aria-labelledby="booking-heading"
-                className="mt-14 rounded-lg border border-brand-100 bg-brand-50 p-6 text-center"
-              >
+          {(phone || email) && (
+            <section
+              aria-labelledby="booking-heading"
+              className="mx-auto mb-12 max-w-6xl px-4"
+            >
+              <div className="rounded-lg border border-brand-100 bg-brand-50 p-6 text-center">
                 <h2 id="booking-heading" className="text-xl font-bold text-gray-900">
                   Ready to book?
                 </h2>
@@ -72,11 +59,11 @@ export default async function RoomsPage() {
                     </a>
                   )}
                 </p>
-              </section>
-            )}
-          </>
-        )}
-      </div>
+              </div>
+            </section>
+          )}
+        </>
+      )}
     </>
   );
 }

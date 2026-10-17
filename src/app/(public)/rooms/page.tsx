@@ -33,7 +33,16 @@ export default async function RoomsPage() {
         </p>
       ) : (
         <>
-          <RoomsBrowser rooms={rooms} currency={settings.currency} />
+
+        <RoomsBrowser
+          rooms={rooms}
+          currency={settings.currency}
+          booking={{
+            whatsappNumber: settings.whatsappNumber,
+            hotelName: settings.hotelName,
+          }}
+        />
+          
 
           {(phone || email) && (
             <section

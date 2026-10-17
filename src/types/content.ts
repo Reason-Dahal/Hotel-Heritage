@@ -35,3 +35,8 @@ export interface PublicNotice {
   image: string;
   key: string; // changes whenever the notice is edited, so edited notices show again
 }
+
+export interface BookingInfo {
+  whatsappNumber: string;
+  hotelName: string;
+}

@@ -1,6 +1,7 @@
 import Image from "next/image";
 import Price from "./Price";
-import type { RoomDTO } from "@/types/content";
+import BookNowButton from "./BookNowButton";
+import type { RoomDTO, BookingInfo } from "@/types/content";
 
 interface Props {
   room: RoomDTO;
@@ -8,6 +9,7 @@ interface Props {
   sizes?: string;
   expanded?: boolean; // show the full description (on tablets and up when compact)
   compact?: boolean; // smaller layout on phones
+  booking?: BookingInfo; // when it has a WhatsApp number, a Book now button shows
 }
 
 export default function RoomCard({
@@ -16,6 +18,7 @@ export default function RoomCard({
   sizes = "(min-width: 640px) 320px, 288px",
   expanded = false,
   compact = false,
+  booking,
 }: Props) {
   const clamp = expanded
     ? compact
@@ -52,7 +55,11 @@ export default function RoomCard({
           {room.name}
         </h3>
         {room.capacity && (
-          <p className={`mt-0.5 text-gray-500 sm:mt-1 ${compact ? "text-xs sm:text-sm" : "text-sm"}`}>
+          <p
+            className={`mt-0.5 text-gray-500 sm:mt-1 ${
+              compact ? "text-xs sm:text-sm" : "text-sm"
+            }`}
+          >
             Sleeps {room.capacity}
           </p>
         )}
@@ -73,6 +80,13 @@ export default function RoomCard({
             unit="per night"
             compact={compact}
           />
+          {booking?.whatsappNumber && (
+            <BookNowButton
+              whatsappNumber={booking.whatsappNumber}
+              hotelName={booking.hotelName}
+              roomName={room.name}
+            />
+          )}
         </div>
       </div>
     </article>

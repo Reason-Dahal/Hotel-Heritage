@@ -3,11 +3,13 @@ import Room, { type IRoom } from "@/models/Room";
 import MenuItem, { type IMenuItem } from "@/models/MenuItem";
 import Category from "@/models/Category";
 import Notice from "@/models/Notice";
+import GalleryImage from "@/models/GalleryImage";
 import type {
   RoomDTO,
   MenuItemDTO,
   CategoryDTO,
   PublicNotice,
+  GalleryImageDTO,
 } from "@/types/content";
 
 const FEATURED_LIMIT = 8;
@@ -170,4 +172,16 @@ export async function getActiveNotices(): Promise<PublicNotice[]> {
       key: `${String(n._id)}:${n.updatedAt ? new Date(n.updatedAt).getTime() : 0}`,
     })
   );
+}
+
+export async function getGalleryImages(): Promise<GalleryImageDTO[]> {
+  await connectDB();
+  const docs = await GalleryImage.find({})
+    .sort({ sortOrder: 1, createdAt: 1 })
+    .lean();
+  return docs.map((g) => ({
+    _id: String(g._id),
+    url: g.url,
+    alt: g.alt ?? "",
+  }));
 }

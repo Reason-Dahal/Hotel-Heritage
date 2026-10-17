@@ -67,6 +67,17 @@ Table categories {
   Note: 'Managed from the admin Categories page. Cannot be deleted while menu items use it.'
 }
 
+Table gallery_images {
+  _id ObjectId [pk]
+  url varchar [not null, note: 'Cloudinary URL; must start with https://res.cloudinary.com/']
+  alt varchar [default: '', note: 'description for search engines and screen readers, max 160 characters']
+  sortOrder int [default: 0, note: 'display order in the homepage gallery']
+  createdAt datetime
+  updatedAt datetime
+
+  Note: 'Managed from the admin Gallery page. Maximum 30 photos.'
+}
+
 Table site_settings {
   _id ObjectId [pk]
   key varchar [not null, unique, note: 'always "main"; this is a singleton']

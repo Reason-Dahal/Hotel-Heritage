@@ -112,3 +112,25 @@ export const categoryInputSchema = z.object({
 export const categoryReorderSchema = z.object({
   orderedIds: z.array(z.string().regex(OBJECT_ID_PATTERN)).min(1).max(100),
 });
+
+// Only photos uploaded through the admin panel (Cloudinary) are accepted,
+// because next/image refuses any other host
+const cloudinaryUrl = z
+  .string()
+  .trim()
+  .refine(
+    (v) => isHttpUrl(v) && v.startsWith("https://res.cloudinary.com/"),
+    "Photos must be uploaded through the admin panel"
+  );
+
+export const galleryImageInputSchema = z.object({
+  url: cloudinaryUrl,
+  alt: z.string().trim().max(160).optional(),
+});
+
+export const galleryUpdateSchema = z.object({
+  alt: z.string().trim().max(160),
+});
+
+// Same shape as categories: the full list of ids in the new order
+export const galleryReorderSchema = categoryReorderSchema;

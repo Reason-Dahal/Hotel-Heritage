@@ -40,3 +40,9 @@ export interface BookingInfo {
   whatsappNumber: string;
   hotelName: string;
 }
+
+export interface GalleryImageDTO {
+  _id: string;
+  url: string;
+  alt: string; // description; empty when the admin hasn't written one
+}

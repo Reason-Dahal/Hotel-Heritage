@@ -1,5 +1,4 @@
 import { getSiteSettings } from "@/lib/settings";
-import { getFeaturedMenuItems, getFeaturedRooms } from "@/lib/content";
 import Hero from "@/components/public/Hero";
 import MessageBanner from "@/components/public/MessageBanner";
 import FeaturedSection from "@/components/public/FeaturedSection";
@@ -7,6 +6,12 @@ import Carousel from "@/components/public/Carousel";
 import DishCard from "@/components/public/DishCard";
 import RoomCard from "@/components/public/RoomCard";
 import MapSection from "@/components/public/MapSection";
+import {
+  getFeaturedMenuItems,
+  getFeaturedRooms,
+  getGalleryImages,
+} from "@/lib/content";
+import GallerySection from "@/components/public/GallerySection";
 
 // Refreshes instantly when content is edited, and at least hourly otherwise
 export const revalidate = 3600;
@@ -14,11 +19,13 @@ export const revalidate = 3600;
 const slideClass = "w-72 shrink-0 snap-start sm:w-80";
 
 export default async function HomePage() {
-  const [settings, dishes, rooms] = await Promise.all([
+  const [settings, dishes, rooms, gallery] = await Promise.all([
     getSiteSettings(),
     getFeaturedMenuItems(),
     getFeaturedRooms(),
+    getGalleryImages(),
   ]);
+
 
   return (
     <>
@@ -73,11 +80,14 @@ export default async function HomePage() {
         </FeaturedSection>
       )}
 
+      <GallerySection images={gallery} hotelName={settings.hotelName} />
+
       <MapSection
         hotelName={settings.hotelName}
         address={settings.address}
         embedUrl={settings.mapEmbedUrl}
       />
+           
     </>
   );
 }

@@ -1,7 +1,7 @@
 "use client";
 
 import { useDeferredValue, useMemo, useState } from "react";
-import type { RoomDTO } from "@/types/content";
+import type { RoomDTO, BookingInfo } from "@/types/content";
 import { matchesQuery } from "@/lib/search";
 import RoomCard from "./RoomCard";
 import SearchBox from "./SearchBox";
@@ -11,9 +11,10 @@ const GRID_SIZES = "(min-width: 1024px) 384px, 50vw";
 interface Props {
   rooms: RoomDTO[];
   currency: string;
+  booking?: BookingInfo;
 }
 
-export default function RoomsBrowser({ rooms, currency }: Props) {
+export default function RoomsBrowser({ rooms, currency, booking }: Props) {
   const [query, setQuery] = useState("");
   const deferredQuery = useDeferredValue(query);
   const searching = deferredQuery.trim() !== "";
@@ -65,6 +66,7 @@ export default function RoomsBrowser({ rooms, currency }: Props) {
                   sizes={GRID_SIZES}
                   expanded
                   compact
+                  booking={booking}
                 />
               </li>
             ))}

@@ -42,7 +42,14 @@ export default async function HomePage() {
           <Carousel label="featured rooms">
             {rooms.map((room) => (
               <li key={room._id} className={slideClass}>
-                <RoomCard room={room} currency={settings.currency} />
+                <RoomCard
+                  room={room}
+                  currency={settings.currency}
+                  booking={{
+                    whatsappNumber: settings.whatsappNumber,
+                    hotelName: settings.hotelName,
+                  }}
+                />
               </li>
             ))}
           </Carousel>

@@ -1,42 +1,42 @@
 # System Context Diagram (C4 Level 1)
 
-This is the highest-level view of the Hotel Website system. It shows who uses
-the system and which external systems it depends on — no internal technical
-detail yet. See `02-container.md` for the next zoom level.
+The highest-level view of the Hotel Website: who uses it and which outside
+services it depends on. No internal detail yet. See `02-container.md` for the
+next zoom level.
 
 ```mermaid
-C4Context
-title System Context diagram - Hotel Website
+flowchart TB
+    visitor["👤 Website Visitor<br/>Browses rooms, menu, gallery, location"]
+    admin["👤 Hotel Admin<br/>Manages all site content"]
 
-Person(visitor, "Website Visitor", "Browses hotel info, signature dishes, rooms, and location")
-Person(admin, "Hotel Admin", "Manages menu items, rooms, and notices")
+    hotelSite["🏨 Hotel Website System<br/>Public site + admin panel<br/>Next.js on Vercel"]
 
-System(hotelSite, "Hotel Website System", "Public marketing site + admin content management, built with Next.js")
+    mongo["🗄️ MongoDB Atlas<br/>Database service"]
+    cloudinary["☁️ Cloudinary<br/>Photo storage and delivery"]
+    maps["🗺️ Google Maps<br/>Embedded location map"]
+    whatsapp["💬 WhatsApp<br/>Visitors message the hotel"]
 
-System_Ext(cloudinary, "Cloudinary", "External image hosting and delivery service")
-System_Ext(mongo, "MongoDB Atlas", "External managed database service")
-System_Ext(maps, "Google Maps", "External map embed service")
+    visitor -->|"views pages, searches menu and rooms"| hotelSite
+    admin -->|"logs in, edits content, uploads photos"| hotelSite
+    hotelSite -->|"reads and writes content"| mongo
+    hotelSite -->|"stores and shows photos"| cloudinary
+    hotelSite -->|"embeds the map"| maps
+    hotelSite -.->|"Book now links open a chat"| whatsapp
+    visitor -.->|"sends the booking message"| whatsapp
 
-Rel(visitor, hotelSite, "Views hotel info, menu, rooms, notices")
-Rel(admin, hotelSite, "Logs in and manages content")
-Rel(hotelSite, cloudinary, "Uploads and fetches images", "HTTPS/API")
-Rel(hotelSite, mongo, "Reads and writes data", "MongoDB driver")
-Rel(hotelSite, maps, "Embeds hotel location", "iframe/API")
+    style hotelSite fill:#4A90D9,color:#fff
+    style visitor fill:#e8e8e8,color:#000
+    style admin fill:#e8e8e8,color:#000
+    style mongo fill:#7ED321,color:#000
+    style cloudinary fill:#F5A623,color:#000
+    style maps fill:#F5A623,color:#000
+    style whatsapp fill:#e8e8e8,color:#000
 ```
 
 ## Reading this diagram
 
-- **Person** shapes = human actors interacting with the system
-- **System** (the central box) = the system we are building — treated as a
-  black box at this zoom level
-- **System_Ext** shapes = external systems we depend on but do not build
-  ourselves
-- **Rel** = a relationship/interaction, always labeled with what happens and
-  (optionally) how
-
-## Why this matters for future upgrades
-
-When Phase 2+ features are added (booking, food ordering, payment gateway),
-this diagram gets one more `System_Ext` box (e.g. `Payment Gateway`) and one
-more `Rel` line — the rest of the diagram doesn't change. That stability is
-the point of starting at this zoom level.
+- Solid arrows are real integrations. Dotted arrows are links only: the site
+  never talks to WhatsApp itself, it gives the visitor a pre-filled chat link.
+- Online booking, food ordering, payments, and reports (future phases) will add
+  new outside systems here, for example a payment gateway, without changing the
+  rest of the diagram.

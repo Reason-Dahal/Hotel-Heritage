@@ -2,10 +2,21 @@ openapi: 3.0.3
 info:
   title: Hotel Website API
   description: >
-    API contract for the Hotel Website system. Public GET endpoints are
-    open to all visitors. All write operations (POST/PUT/PATCH/DELETE)
-    require an authenticated admin session (NextAuth session cookie).
-  version: 1.0.0
+    API contract for the Hotel Website system. Public GET endpoints are open to
+    everyone. Every write operation (POST, PUT, PATCH, DELETE) and the upload
+    signature endpoint require an authenticated admin session cookie.
+
+    All responses are JSON shaped like { "success": true, ... } on success or
+    { "success": false, "error": ... } on failure, where error is a string or an
+    object of field messages.
+
+    Note: the site's own pages read content through server-side helpers instead
+    of these GET endpoints (see ADR 0011). The GET endpoints stay available for
+    future external consumers.
+
+    Known issue: the rooms, menu, and notices routes answer 500 instead of 400
+    when the id in the path is malformed. This is tracked in the hardening list.
+  version: 2.0.0
 
 servers:
   - url: https://your-hotel-site.vercel.app/api
@@ -16,30 +27,29 @@ servers:
 tags:
   - name: Rooms
   - name: Menu
-  - name: Notices
-  - name: Auth
-  - name: Settings
   - name: Categories
+  - name: Notices
   - name: Gallery
+  - name: Settings
+  - name: Upload
+  - name: Auth
 
 paths:
   /rooms:
     get:
       tags: [Rooms]
       summary: List all rooms
-      description: Public. Returns all rooms for the "All Rooms" page and featured slideshow.
+      description: Public.
       responses:
         "200":
-          description: Array of rooms
+          description: All rooms
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Room"
+                $ref: "#/components/schemas/RoomListResponse"
     post:
       tags: [Rooms]
-      summary: Create a new room
+      summary: Create a room
       description: Admin only.
       security:
         - adminSession: []
@@ -55,23 +65,21 @@ paths:
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/Room"
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
 
   /rooms/{id}:
     put:
       tags: [Rooms]
       summary: Update a room
-      description: Admin only.
+      description: Admin only. Send any subset of the fields; omitted fields are left unchanged.
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       requestBody:
         required: true
         content:
@@ -81,10 +89,16 @@ paths:
       responses:
         "200":
           description: Room updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/RoomResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Room not found
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: [Rooms]
       summary: Delete a room
@@ -92,37 +106,35 @@ paths:
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       responses:
-        "204":
+        "200":
           description: Room deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Room not found
+          $ref: "#/components/responses/NotFound"
 
   /menu:
     get:
       tags: [Menu]
       summary: List all menu items
-      description: Public. Returns all items for the "Full Menu" page and signature dish slideshow.
+      description: Public. Items carry categoryId; use /categories for the names and order.
       responses:
         "200":
-          description: Array of menu items
+          description: All menu items
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/MenuItem"
+                $ref: "#/components/schemas/MenuItemListResponse"
     post:
       tags: [Menu]
-      summary: Create a new menu item
-      description: Admin only.
+      summary: Create a menu item
+      description: Admin only. A given categoryId must refer to an existing category.
       security:
         - adminSession: []
       requestBody:
@@ -134,22 +146,24 @@ paths:
       responses:
         "201":
           description: Menu item created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItemResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
 
   /menu/{id}:
     put:
       tags: [Menu]
       summary: Update a menu item
-      description: Admin only.
+      description: Admin only. Send any subset of the fields. Send categoryId as null to clear the category.
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       requestBody:
         required: true
         content:
@@ -159,10 +173,16 @@ paths:
       responses:
         "200":
           description: Menu item updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MenuItemResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Menu item not found
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: [Menu]
       summary: Delete a menu item
@@ -170,20 +190,20 @@ paths:
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       responses:
-        "204":
+        "200":
           description: Menu item deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Menu item not found
+          $ref: "#/components/responses/NotFound"
 
-    /categories:
+  /categories:
     get:
       tags: [Categories]
       summary: List categories in display order
@@ -194,13 +214,11 @@ paths:
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Category"
+                $ref: "#/components/schemas/CategoryListResponse"
     post:
       tags: [Categories]
       summary: Create a category
-      description: Admin only. Names are unique, ignoring capital letters.
+      description: Admin only. Names are unique, ignoring capital letters. New categories go to the end of the order.
       security:
         - adminSession: []
       requestBody:
@@ -212,26 +230,26 @@ paths:
       responses:
         "201":
           description: Category created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "409":
-          description: A category with that name already exists
+          $ref: "#/components/responses/Conflict"
 
   /categories/{id}:
     put:
       tags: [Categories]
       summary: Rename a category
-      description: Admin only.
+      description: Admin only. Menu items follow the rename automatically because they reference the id.
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       requestBody:
         required: true
         content:
@@ -241,41 +259,47 @@ paths:
       responses:
         "200":
           description: Category renamed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/CategoryResponse"
         "400":
-          description: Invalid id or validation error
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Category not found
+          $ref: "#/components/responses/NotFound"
         "409":
-          description: A category with that name already exists
+          $ref: "#/components/responses/Conflict"
     delete:
       tags: [Categories]
       summary: Delete a category
-      description: Admin only. Refused while menu items use the category.
+      description: Admin only. Refused with 409 while any menu item uses the category.
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       responses:
         "200":
           description: Category deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
         "404":
-          description: Category not found
+          $ref: "#/components/responses/NotFound"
         "409":
-          description: Menu items still use this category
+          $ref: "#/components/responses/Conflict"
 
   /categories/reorder:
     post:
       tags: [Categories]
       summary: Set the display order of categories
-      description: Admin only. Send every category id in the desired order.
+      description: Admin only. Send category ids in the desired order, without duplicates.
       security:
         - adminSession: []
       requestBody:
@@ -283,38 +307,34 @@ paths:
         content:
           application/json:
             schema:
-              type: object
-              required: [orderedIds]
-              properties:
-                orderedIds:
-                  type: array
-                  items:
-                    type: string
+              $ref: "#/components/schemas/ReorderInput"
       responses:
         "200":
           description: Order saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
 
   /notices:
     get:
       tags: [Notices]
       summary: List active notices
-      description: Public. Returns only notices with active=true, for the popup. Empty array means no popup shows.
+      description: Public. Returns only notices with active=true. An empty list means no popup is shown.
       responses:
         "200":
-          description: Array of active notices
+          description: Active notices
           content:
             application/json:
               schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/Notice"
+                $ref: "#/components/schemas/NoticeListResponse"
     post:
       tags: [Notices]
-      summary: Create a new notice
+      summary: Create a notice
       description: Admin only.
       security:
         - adminSession: []
@@ -327,36 +347,43 @@ paths:
       responses:
         "201":
           description: Notice created
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoticeResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
 
   /notices/{id}:
     patch:
       tags: [Notices]
-      summary: Toggle a notice active/inactive
-      description: Admin only.
+      summary: Update a notice or switch it on or off
+      description: Admin only. Send any subset of the fields, for example only active.
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       requestBody:
         required: true
         content:
           application/json:
             schema:
-              type: object
-              properties:
-                active:
-                  type: boolean
+              $ref: "#/components/schemas/NoticeInput"
       responses:
         "200":
           description: Notice updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/NoticeResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
     delete:
       tags: [Notices]
       summary: Delete a notice
@@ -364,33 +391,153 @@ paths:
       security:
         - adminSession: []
       parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
+        - $ref: "#/components/parameters/Id"
       responses:
-        "204":
+        "200":
           description: Notice deleted
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /gallery:
+    get:
+      tags: [Gallery]
+      summary: List gallery photos in display order
+      description: Public.
+      responses:
+        "200":
+          description: Ordered gallery photos
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryListResponse"
+    post:
+      tags: [Gallery]
+      summary: Add a photo to the gallery
+      description: Admin only. The url must be a Cloudinary address. The gallery holds at most 30 photos.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/GalleryImageInput"
+      responses:
+        "201":
+          description: Photo added to the end of the gallery
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "409":
+          $ref: "#/components/responses/Conflict"
+
+  /gallery/{id}:
+    put:
+      tags: [Gallery]
+      summary: Update a photo's description
+      description: Admin only.
+      security:
+        - adminSession: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              type: object
+              required: [alt]
+              properties:
+                alt:
+                  type: string
+                  maxLength: 160
+      responses:
+        "200":
+          description: Photo updated
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/GalleryResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+    delete:
+      tags: [Gallery]
+      summary: Remove a photo from the gallery
+      description: Admin only. The image file itself stays in Cloudinary.
+      security:
+        - adminSession: []
+      parameters:
+        - $ref: "#/components/parameters/Id"
+      responses:
+        "200":
+          description: Photo removed
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/MessageResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+        "404":
+          $ref: "#/components/responses/NotFound"
+
+  /gallery/reorder:
+    post:
+      tags: [Gallery]
+      summary: Set the display order of gallery photos
+      description: Admin only. Send photo ids in the desired order, without duplicates.
+      security:
+        - adminSession: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: "#/components/schemas/ReorderInput"
+      responses:
+        "200":
+          description: Order saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
+        "400":
+          $ref: "#/components/responses/ValidationError"
+        "401":
+          $ref: "#/components/responses/Unauthorized"
 
   /settings:
     get:
       tags: [Settings]
       summary: Get site settings
-      description: Public. Hotel name, contact details, social links, map, hero image, and banner messages.
+      description: Public. Defaults are returned until settings are first saved.
       responses:
         "200":
           description: Site settings
           content:
             application/json:
               schema:
-                $ref: "#/components/schemas/SiteSettings"
+                $ref: "#/components/schemas/SettingsResponse"
     put:
       tags: [Settings]
-      summary: Update site settings
-      description: Admin only. Creates the settings document on first save.
+      summary: Save site settings
+      description: Admin only. Creates the settings document on first save. hotelName is required.
       security:
         - adminSession: []
       requestBody:
@@ -402,154 +549,201 @@ paths:
       responses:
         "200":
           description: Settings saved
+          content:
+            application/json:
+              schema:
+                $ref: "#/components/schemas/SuccessResponse"
         "400":
-          description: Validation error
+          $ref: "#/components/responses/ValidationError"
         "401":
-          description: Not authenticated as admin
+          $ref: "#/components/responses/Unauthorized"
 
-  /auth/login:
+  /upload/sign:
+    post:
+      tags: [Upload]
+      summary: Get a signed Cloudinary upload signature
+      description: >
+        Admin only. The browser then uploads the photo straight to Cloudinary
+        using the returned values, so the API secret never leaves the server.
+      security:
+        - adminSession: []
+      responses:
+        "200":
+          description: Signature for one upload
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  success:
+                    type: boolean
+                    example: true
+                  signature:
+                    type: string
+                  timestamp:
+                    type: integer
+                  folder:
+                    type: string
+                    example: hotel-heritage
+                  apiKey:
+                    type: string
+                  cloudName:
+                    type: string
+        "401":
+          $ref: "#/components/responses/Unauthorized"
+
+  /auth/csrf:
+    get:
+      tags: [Auth]
+      summary: Get a CSRF token for signing in
+      description: Handled by NextAuth.
+      responses:
+        "200":
+          description: CSRF token
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  csrfToken:
+                    type: string
+
+  /auth/callback/credentials:
     post:
       tags: [Auth]
       summary: Admin login
-      description: Handled by NextAuth Credentials provider. Sets a session cookie on success.
+      description: >
+        Handled by NextAuth (normally called through signIn from next-auth/react).
+        On success the response sets the session cookie.
       requestBody:
         required: true
         content:
-          application/json:
+          application/x-www-form-urlencoded:
             schema:
               type: object
+              required: [csrfToken, email, password]
               properties:
+                csrfToken:
+                  type: string
                 email:
                   type: string
                 password:
                   type: string
       responses:
         "200":
-          description: Login successful, session cookie set
-        "401":
-          description: Invalid credentials
+          description: Login processed; the session cookie is set when the credentials are valid
 
-    /gallery:
+  /auth/session:
     get:
-      tags: [Gallery]
-      summary: List gallery photos in display order
-      description: Public.
+      tags: [Auth]
+      summary: Get the current session
+      description: Handled by NextAuth. Returns an empty object when nobody is logged in.
       responses:
         "200":
-          description: Ordered gallery photos
-          content:
-            application/json:
-              schema:
-                type: array
-                items:
-                  $ref: "#/components/schemas/GalleryImage"
-    post:
-      tags: [Gallery]
-      summary: Add a photo to the gallery
-      description: Admin only. The url must be a Cloudinary address. Maximum 30 photos.
-      security:
-        - adminSession: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              $ref: "#/components/schemas/GalleryImageInput"
-      responses:
-        "201": { description: Photo added }
-        "400": { description: Validation error }
-        "401": { description: Not authenticated as admin }
-        "409": { description: The gallery is full }
-
-  /gallery/{id}:
-    put:
-      tags: [Gallery]
-      summary: Update a photo's description
-      description: Admin only.
-      security:
-        - adminSession: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [alt]
-              properties:
-                alt: { type: string, maxLength: 160 }
-      responses:
-        "200": { description: Photo updated }
-        "400": { description: Invalid id or validation error }
-        "401": { description: Not authenticated as admin }
-        "404": { description: Photo not found }
-    delete:
-      tags: [Gallery]
-      summary: Remove a photo from the gallery
-      description: Admin only.
-      security:
-        - adminSession: []
-      parameters:
-        - name: id
-          in: path
-          required: true
-          schema:
-            type: string
-      responses:
-        "200": { description: Photo removed }
-        "401": { description: Not authenticated as admin }
-        "404": { description: Photo not found }
-
-  /gallery/reorder:
-    post:
-      tags: [Gallery]
-      summary: Set the display order of gallery photos
-      description: Admin only. Send every photo id in the desired order.
-      security:
-        - adminSession: []
-      requestBody:
-        required: true
-        content:
-          application/json:
-            schema:
-              type: object
-              required: [orderedIds]
-              properties:
-                orderedIds:
-                  type: array
-                  items:
-                    type: string
-      responses:
-        "200": { description: Order saved }
-        "400": { description: Validation error }
-        "401": { description: Not authenticated as admin }
+          description: The current session or an empty object
 
 components:
   securitySchemes:
     adminSession:
       type: apiKey
       in: cookie
-      name: next-auth.session-token
+      name: authjs.session-token
+      description: >
+        Session cookie set by NextAuth after login. Over HTTPS the cookie is named
+        __Secure-authjs.session-token.
+
+  parameters:
+    Id:
+      name: id
+      in: path
+      required: true
+      schema:
+        type: string
+        pattern: "^[a-f0-9]{24}$"
+      description: MongoDB ObjectId of the record
+
+  responses:
+    ValidationError:
+      description: The request body or id is invalid
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Unauthorized:
+      description: Not authenticated as admin
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    NotFound:
+      description: The record does not exist
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
+    Conflict:
+      description: >
+        The request conflicts with current data: a duplicate category name, a
+        category that is still in use, or a full gallery
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/ErrorResponse"
 
   schemas:
-    Room:
-      allOf:
-        - type: object
-          properties:
-            _id:
-              type: string
-            createdAt:
-              type: string
-              format: date-time
-            updatedAt:
-              type: string
-              format: date-time
-        - $ref: "#/components/schemas/RoomInput"
+    ErrorResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: false
+        error:
+          oneOf:
+            - type: string
+            - type: object
+              additionalProperties:
+                type: array
+                items:
+                  type: string
+
+    SuccessResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+
+    MessageResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        message:
+          type: string
+
+    DbDocument:
+      type: object
+      properties:
+        _id:
+          type: string
+        createdAt:
+          type: string
+          format: date-time
+        updatedAt:
+          type: string
+          format: date-time
+
+    ReorderInput:
+      type: object
+      required: [orderedIds]
+      properties:
+        orderedIds:
+          type: array
+          minItems: 1
+          maxItems: 100
+          items:
+            type: string
 
     RoomInput:
       type: object
@@ -557,7 +751,7 @@ components:
       properties:
         name:
           type: string
-          example: "Deluxe Double Room"
+          example: Deluxe Double Room
         description:
           type: string
         images:
@@ -567,32 +761,45 @@ components:
             format: uri
         price:
           type: number
+          minimum: 0
+          exclusiveMinimum: true
           example: 120
         discountPercent:
-          type: integer
+          type: number
           minimum: 0
           maximum: 100
-          default: 0
         capacity:
           type: integer
-          example: 2
+          minimum: 1
         featured:
           type: boolean
-          default: false
 
-    MenuItem:
+    Room:
       allOf:
-        - type: object
-          properties:
-            _id:
-              type: string
-            createdAt:
-              type: string
-              format: date-time
-            updatedAt:
-              type: string
-              format: date-time
-        - $ref: "#/components/schemas/MenuItemInput"
+        - $ref: "#/components/schemas/DbDocument"
+        - $ref: "#/components/schemas/RoomInput"
+
+    RoomListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+        rooms:
+          type: array
+          items:
+            $ref: "#/components/schemas/Room"
+
+    RoomResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        room:
+          $ref: "#/components/schemas/Room"
 
     MenuItemInput:
       type: object
@@ -600,7 +807,7 @@ components:
       properties:
         name:
           type: string
-          example: "Grilled Salmon"
+          example: Grilled Salmon
         description:
           type: string
         images:
@@ -608,48 +815,90 @@ components:
           items:
             type: string
             format: uri
-        category:
+        categoryId:
           type: string
-          example: "Signature Dish"
+          nullable: true
+          pattern: "^[a-f0-9]{24}$"
+          description: Id of a category, or null for none
         price:
           type: number
+          minimum: 0
+          exclusiveMinimum: true
           example: 18.5
         discountPercent:
-          type: integer
+          type: number
           minimum: 0
           maximum: 100
-          default: 0
         featured:
           type: boolean
-          default: false
 
-        GalleryImage:
-      type: object
-      properties:
-        _id: { type: string }
-        url: { type: string }
-        alt: { type: string }
-
-    GalleryImageInput:
-      type: object
-      required: [url]
-      properties:
-        url: { type: string, description: "Cloudinary address (https://res.cloudinary.com/...)" }
-        alt: { type: string, maxLength: 160 }
-
-    Notice:
+    MenuItem:
       allOf:
-        - type: object
-          properties:
-            _id:
-              type: string
-            createdAt:
-              type: string
-              format: date-time
-            updatedAt:
-              type: string
-              format: date-time
-        - $ref: "#/components/schemas/NoticeInput"
+        - $ref: "#/components/schemas/DbDocument"
+        - $ref: "#/components/schemas/MenuItemInput"
+
+    MenuItemListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+        items:
+          type: array
+          items:
+            $ref: "#/components/schemas/MenuItem"
+
+    MenuItemResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        item:
+          $ref: "#/components/schemas/MenuItem"
+
+    CategoryInput:
+      type: object
+      required: [name]
+      properties:
+        name:
+          type: string
+          minLength: 1
+          maxLength: 60
+
+    Category:
+      type: object
+      properties:
+        _id:
+          type: string
+        name:
+          type: string
+        sortOrder:
+          type: integer
+
+    CategoryListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+        categories:
+          type: array
+          items:
+            $ref: "#/components/schemas/Category"
+
+    CategoryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        category:
+          $ref: "#/components/schemas/Category"
 
     NoticeInput:
       type: object
@@ -661,30 +910,146 @@ components:
           type: string
         image:
           type: string
-          format: uri
+          description: Image URL, or an empty string for no image
         active:
           type: boolean
-          default: false
 
-        SiteSettings:
+    Notice:
+      allOf:
+        - $ref: "#/components/schemas/DbDocument"
+        - $ref: "#/components/schemas/NoticeInput"
+
+    NoticeListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+        notices:
+          type: array
+          items:
+            $ref: "#/components/schemas/Notice"
+
+    NoticeResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        notice:
+          $ref: "#/components/schemas/Notice"
+
+    GalleryImageInput:
+      type: object
+      required: [url]
+      properties:
+        url:
+          type: string
+          description: Cloudinary address (https://res.cloudinary.com/...)
+        alt:
+          type: string
+          maxLength: 160
+
+    GalleryImage:
+      type: object
+      properties:
+        _id:
+          type: string
+        url:
+          type: string
+        alt:
+          type: string
+        sortOrder:
+          type: integer
+
+    GalleryListResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        count:
+          type: integer
+        images:
+          type: array
+          items:
+            $ref: "#/components/schemas/GalleryImage"
+
+    GalleryResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        image:
+          $ref: "#/components/schemas/GalleryImage"
+
+    SiteSettings:
       type: object
       required: [hotelName]
       properties:
-        hotelName: { type: string, maxLength: 100 }
-        tagline: { type: string, maxLength: 160 }
-        description: { type: string, maxLength: 500 }
-        address: { type: string }
-        phone: { type: string }
-        email: { type: string }
-        facebookUrl: { type: string, description: "http(s) link or empty" }
-        instagramUrl: { type: string }
-        tiktokUrl: { type: string }
-        youtubeUrl: { type: string }
-        whatsappUrl: { type: string }
-        mapEmbedUrl: { type: string, description: "Must start with https://www.google.com/maps/embed, or empty" }
-        heroImage: { type: string }
+        hotelName:
+          type: string
+          maxLength: 100
+        tagline:
+          type: string
+          maxLength: 160
+        description:
+          type: string
+          maxLength: 500
+        currency:
+          type: string
+          example: NPR
+          description: Three-letter ISO currency code
+        address:
+          type: string
+          maxLength: 300
+        phone:
+          type: string
+          maxLength: 40
+        email:
+          type: string
+        whatsappNumber:
+          type: string
+          example: "9779812345678"
+          description: Digits only with country code, or empty. Spaces, dashes, brackets, and + are stripped when saving.
+        facebookUrl:
+          type: string
+          description: An http(s) link, or empty
+        instagramUrl:
+          type: string
+        tiktokUrl:
+          type: string
+        youtubeUrl:
+          type: string
+        mapEmbedUrl:
+          type: string
+          description: Must start with https://www.google.com/maps/embed, or be empty
+        heroImage:
+          type: string
+        heroSubtitle:
+          type: string
+          maxLength: 160
         bannerMessages:
           type: array
           maxItems: 10
-          items: { type: string, maxLength: 200 }
-        currency: { type: string, example: "NPR", description: "3-letter ISO currency code" }
+          items:
+            type: string
+            maxLength: 200
+        tickerMessages:
+          type: array
+          maxItems: 10
+          items:
+            type: string
+            maxLength: 200
+
+    SettingsResponse:
+      type: object
+      properties:
+        success:
+          type: boolean
+          example: true
+        settings:
+          $ref: "#/components/schemas/SiteSettings"

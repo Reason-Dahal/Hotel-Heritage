@@ -1,78 +1,72 @@
 // Database Schema - Hotel Website
 // Format: DBML (https://dbml.dbdiagram.io)
-// Note: MongoDB is document-based (NoSQL). This file documents the SHAPE
-// of each collection. There are no foreign keys / joins between collections
-// in Phase 1 - each is independent. Preview this file free at dbdiagram.io
-// by pasting it into a new diagram.
+//
+// MongoDB is document-based (NoSQL), so this file documents the SHAPE of each
+// collection. There is one reference between collections:
+// menu_items.categoryId -> categories._id. MongoDB does not enforce it, so the
+// application does: a category cannot be deleted while menu items use it, and
+// the menu routes check that a chosen category exists.
+//
+// Preview this file free at dbdiagram.io by pasting it into a new diagram.
 
 Table rooms {
   _id ObjectId [pk]
   name varchar [not null, note: 'e.g. "Deluxe Double Room"']
   description text
-  images varchar[] [note: 'array of Cloudinary image URLs']
-  price decimal [not null, note: 'base price per night, in local currency']
+  images varchar[] [note: 'Cloudinary image URLs']
+  price decimal [not null, note: 'price per night, in the currency set in site_settings']
   discountPercent int [default: 0, note: '0-100, admin controlled']
-  capacity int [note: 'max guests']
-  featured boolean [default: false, note: 'shown in homepage slideshow']
+  capacity int [note: 'maximum guests']
+  featured boolean [default: false, note: 'shown in the homepage slideshow']
   createdAt datetime [default: `now()`]
   updatedAt datetime
 
-  Note: 'Managed via admin panel CRUD. Public GET is read-only.'
-}
-
-Table menu_items {
-  _id ObjectId [pk]
-  name varchar [not null, note: 'e.g. "Grilled Salmon"']
-  description text
-  images varchar[] [note: 'array of Cloudinary image URLs']
-  categoryId ObjectId [ref: > categories._id, note: 'optional; null shows under "Other" on the public menu']
-  price decimal [not null]
-  discountPercent int [default: 0, note: '0-100, admin controlled']
-  featured boolean [default: false, note: 'shown in homepage slideshow']
-  createdAt datetime [default: `now()`]
-  updatedAt datetime
-
-  Note: 'Managed via admin panel CRUD. Public GET is read-only.'
-}
-
-Table notices {
-  _id ObjectId [pk]
-  title varchar [not null]
-  message text [not null]
-  image varchar [note: 'optional Cloudinary image URL']
-  active boolean [default: false, note: 'ON/OFF toggle, controls popup visibility']
-  createdAt datetime [default: `now()`]
-  updatedAt datetime
-
-  Note: 'If zero notices have active=true, no popup renders at all. Multiple active notices stack/overlap on screen.'
-}
-
-Table admins {
-  _id ObjectId [pk]
-  email varchar [not null, unique]
-  hashedPassword varchar [not null, note: 'bcrypt hashed, never store plain text']
-  createdAt datetime [default: `now()`]
-  updatedAt datetime
-
-  Note: 'Single admin account for Phase 1. NextAuth Credentials provider reads from this collection.'
+  Note: 'Managed from the admin Rooms page. Public pages read it directly.'
 }
 
 Table categories {
   _id ObjectId [pk]
   name varchar [not null, unique, note: 'unique ignoring capital letters']
   sortOrder int [default: 0, note: 'display order on the public menu']
-  createdAt datetime
+  createdAt datetime [default: `now()`]
   updatedAt datetime
 
   Note: 'Managed from the admin Categories page. Cannot be deleted while menu items use it.'
 }
 
+Table menu_items {
+  _id ObjectId [pk]
+  name varchar [not null, note: 'e.g. "Grilled Salmon"']
+  description text
+  images varchar[] [note: 'Cloudinary image URLs']
+  categoryId ObjectId [ref: > categories._id, note: 'optional; empty means the dish shows under "Other"']
+  price decimal [not null]
+  discountPercent int [default: 0, note: '0-100, admin controlled']
+  featured boolean [default: false, note: 'signature dish, shown in the homepage slideshow']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'Managed from the admin Menu page.'
+}
+
+Table notices {
+  _id ObjectId [pk]
+  title varchar [not null]
+  message text [not null]
+  image varchar [note: 'optional Cloudinary image URL; empty means no image']
+  active boolean [default: false, note: 'ON/OFF toggle; only active notices appear in the popup']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'No active notices means no popup at all. Several active notices stack, newest on top (maximum 5 shown).'
+}
+
 Table gallery_images {
   _id ObjectId [pk]
   url varchar [not null, note: 'Cloudinary URL; must start with https://res.cloudinary.com/']
-  alt varchar [default: '', note: 'description for search engines and screen readers, max 160 characters']
+  alt varchar [default: '', note: 'description shown as a caption and used as alt text; maximum 160 characters']
   sortOrder int [default: 0, note: 'display order in the homepage gallery']
-  createdAt datetime
+  createdAt datetime [default: `now()`]
   updatedAt datetime
 
   Note: 'Managed from the admin Gallery page. Maximum 30 photos.'
@@ -80,26 +74,36 @@ Table gallery_images {
 
 Table site_settings {
   _id ObjectId [pk]
-  key varchar [not null, unique, note: 'always "main"; this is a singleton']
+  key varchar [not null, unique, note: 'always "main"; this collection holds a single document']
   hotelName varchar [not null]
-  tagline varchar
-  description text [note: 'default meta description for SEO']
+  tagline varchar [note: 'used in the browser title and the footer']
+  description text [note: 'default meta description for search engines']
+  currency varchar [default: 'NPR', note: 'ISO 4217 code used to format public prices']
   address varchar
   phone varchar
   email varchar
+  whatsappNumber varchar [note: 'digits only with country code, e.g. 9779812345678; builds the wa.me links']
   facebookUrl varchar
   instagramUrl varchar
   tiktokUrl varchar
   youtubeUrl varchar
-  
-  whatsappNumber varchar [note: 'digits only with country code, e.g. 9779812345678; builds wa.me links']
-  heroSubtitle varchar [note: 'text on the homepage main photo; separate from tagline']
-  tickerMessages varchar[] [note: 'max 10, moving messages in the header']
-
   mapEmbedUrl varchar [note: 'must start with https://www.google.com/maps/embed']
-  heroImage varchar [note: 'Cloudinary image URL']
-  bannerMessages varchar[] [note: 'max 10, rotate in homepage banner']
-  createdAt datetime
+  heroImage varchar [note: 'Cloudinary image URL for the homepage main photo']
+  heroSubtitle varchar [note: 'text on the main photo; separate from the tagline']
+  bannerMessages varchar[] [note: 'maximum 10; rotate in the banner under the main photo']
+  tickerMessages varchar[] [note: 'maximum 10; move in the header ticker on every page']
+  createdAt datetime [default: `now()`]
   updatedAt datetime
-  currency varchar [default: 'NPR', note: 'ISO 4217 code used to format public prices']
+
+  Note: 'Managed from the admin Settings page. Defaults are used until it is first saved.'
+}
+
+Table admins {
+  _id ObjectId [pk]
+  email varchar [not null, unique]
+  hashedPassword varchar [not null, note: 'bcrypt hash, never the plain password']
+  createdAt datetime [default: `now()`]
+  updatedAt datetime
+
+  Note: 'One admin account. Created with scripts/createAdmin.ts; there is no public sign-up.'
 }

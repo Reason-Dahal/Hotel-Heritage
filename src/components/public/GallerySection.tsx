@@ -12,7 +12,7 @@ export default function GallerySection({ images, hotelName }: Props) {
   return (
     <section
       aria-labelledby="gallery-heading"
-      className="mx-auto max-w-5xl px-4 py-12"
+      className="mx-auto max-w-6xl px-4 py-12"
     >
       <h2
         id="gallery-heading"

@@ -111,13 +111,13 @@ export default function GallerySlider({ images, label, hotelName }: Props) {
                 aria-roledescription="slide"
                 aria-label={`${i + 1} of ${count}`}
                 aria-hidden={i !== current || undefined}
-                className="relative aspect-[4/3] w-full shrink-0 snap-center bg-gray-100 sm:aspect-[16/9]"
+                className="relative aspect-[4/3] w-full shrink-0 snap-center bg-gray-100 sm:aspect-[16/9] lg:aspect-auto lg:h-[30rem]"
               >
                 <Image
                   src={image.url}
                   alt={caption || `${hotelName} photo ${i + 1}`}
                   fill
-                  sizes="(min-width: 1024px) 1024px, 100vw"
+                  sizes="(min-width: 1152px) 1120px, 100vw"
                   className="object-cover"
                 />
 

@@ -21,14 +21,14 @@ export default function HeaderNav() {
       : !href.includes("#") && pathname.startsWith(href);
 
   return (
-    <nav aria-label="Main navigation" className="border-t border-gray-100">
+    <nav aria-label="Main navigation">
       <div className="flex justify-center md:hidden">
         <button
           type="button"
           aria-expanded={open}
           aria-controls="main-menu"
           onClick={() => setOpen((o) => !o)}
-          className="p-3 text-gray-700"
+          className="p-2.5 text-gray-700 hover:text-brand-700"
         >
           <span className="sr-only">
             {open ? "Close navigation" : "Open navigation"}
@@ -53,7 +53,7 @@ export default function HeaderNav() {
 
       <ul
         id="main-menu"
-        className={`${open ? "flex" : "hidden"} flex-col items-center pb-3 md:flex md:flex-row md:justify-center md:gap-8 md:pb-0`}
+        className={`${open ? "flex" : "hidden"} flex-col items-center pb-3 md:flex md:flex-row md:justify-center md:gap-10 md:pb-2`}
       >
         {links.map(({ href, label }) => {
           const active = isActive(href);
@@ -63,10 +63,10 @@ export default function HeaderNav() {
                 href={href}
                 onClick={() => setOpen(false)}
                 aria-current={active ? "page" : undefined}
-                className={`block px-3 py-2 text-sm font-medium md:py-3 ${
+                className={`block px-3 py-2 text-sm tracking-wide md:py-2.5 ${
                   active
-                    ? "text-brand-700"
-                    : "text-gray-700 hover:text-brand-700"
+                    ? "font-semibold text-brand-700"
+                    : "font-medium text-gray-600 hover:text-brand-700"
                 }`}
               >
                 {label}

@@ -9,11 +9,12 @@ interface Props {
 
 export default function Header({ hotelName, tickerMessages }: Props) {
   return (
-    <header className="border-b border-gray-200 bg-white">
-      <div className="mx-auto max-w-6xl px-4 py-4 text-center">
+    <header>
+      <div className="mx-auto max-w-6xl px-4 pt-6 text-center">
+        {/* The left padding balances the letter spacing, so the name sits exactly centered */}
         <Link
           href="/"
-          className="inline-block text-2xl font-bold tracking-wide text-gray-900 md:text-3xl"
+          className="inline-block text-balance pl-[0.18em] text-xl font-semibold uppercase tracking-[0.18em] text-gray-900 focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-brand-600 md:text-2xl"
         >
           {hotelName}
         </Link>

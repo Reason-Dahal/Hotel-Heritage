@@ -7,6 +7,7 @@ import { roomsJsonLd } from "@/lib/structuredData";
 import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/public/PageHeader";
 import RoomsBrowser from "@/components/public/RoomsBrowser";
+import { COPY } from "@/lib/copy";
 
 export const revalidate = 3600;
 
@@ -31,7 +32,8 @@ export default async function RoomsPage() {
 
       <PageHeader
         title="Our rooms"
-        intro="Comfortable stays with clear pricing. All prices are per night."
+        intro={COPY.rooms}
+
       />
 
       {rooms.length === 0 ? (

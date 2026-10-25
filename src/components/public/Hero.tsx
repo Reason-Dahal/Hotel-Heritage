@@ -1,4 +1,5 @@
 import Image from "next/image";
+import { COPY } from "@/lib/copy";
 
 interface Props {
   hotelName: string;
@@ -32,6 +33,9 @@ export default function Hero({ hotelName, subtitle, image, imageAlt }: Props) {
         {subtitle && (
           <p className="mt-3 text-lg text-gray-100 md:text-xl">{subtitle}</p>
         )}
+        <p className="mx-auto mt-3 max-w-xl text-sm text-gray-200 md:text-base">
+          {COPY.hero}
+        </p>
       </div>
     </section>
   );

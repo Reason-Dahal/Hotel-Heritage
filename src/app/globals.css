@@ -18,12 +18,39 @@
   --foreground: #171717;
 }
 
-@theme inline {
-  --color-background: var(--background);
-  --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
-  --font-mono: var(--font-geist-mono);
+@theme {
+  /* Brand accent, from the hotel interior: oak, bronze, walnut, cream.
+     Change these to rebrand the whole public site. */
+  --color-brand-50: #f6ede1;
+  --color-brand-100: #ebdcc9;
+  --color-brand-400: #b78050;
+  --color-brand-600: #a86a33;
+  --color-brand-700: #8f5529;
+  --color-brand-800: #6a3b1c;
+
+  /* Dark surfaces (footer, hero overlay): warm espresso */
+  --color-ink: #1e120c;
 }
+
+/* Warm neutrals for the PUBLIC site only. The admin panel is outside this
+   wrapper, so it keeps the standard grays. */
+   .public-theme {
+    --color-white: #fffcf8;
+    --color-black: #1e120c;
+    --color-gray-50: #faf6f0;
+    --color-gray-100: #f3ece2;
+    --color-gray-200: #e6dbcd;
+    --color-gray-300: #d2c4b3;
+    --color-gray-400: #a8998a;
+    --color-gray-500: #75675a;
+    --color-gray-600: #5e5146;
+    --color-gray-700: #4a3f36;
+    --color-gray-800: #33291f;
+    --color-gray-900: #211811;
+  
+    background-color: var(--color-gray-50);
+    color: var(--color-gray-900);
+  }
 
 /* Header news ticker: two identical groups both slide left by one group width,
    then the loop restarts. The layouts are identical at that point, so it is seamless. */

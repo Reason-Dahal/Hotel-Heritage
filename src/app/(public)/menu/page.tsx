@@ -10,6 +10,7 @@ import { menuJsonLd } from "@/lib/structuredData";
 import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/public/PageHeader";
 import MenuBrowser from "@/components/public/MenuBrowser";
+import { COPY } from "@/lib/copy";
 
 export const revalidate = 3600;
 
@@ -40,7 +41,7 @@ export default async function MenuPage() {
 
       <PageHeader
         title="Our menu"
-        intro="Freshly prepared dishes, served daily. Prices are shown in full, with any current offers."
+        intro={COPY.menu}
       />
 
       {sections.length === 0 ? (

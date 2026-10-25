@@ -16,6 +16,7 @@ import DishCard from "@/components/public/DishCard";
 import RoomCard from "@/components/public/RoomCard";
 import MapSection from "@/components/public/MapSection";
 import GallerySection from "@/components/public/GallerySection";
+import { COPY } from "@/lib/copy";
 
 // Refreshes instantly when content is edited, and at least hourly otherwise
 export const revalidate = 3600;
@@ -59,6 +60,7 @@ export default async function HomePage() {
         <FeaturedSection
           id="featured-rooms"
           title="Featured rooms"
+          intro={COPY.rooms}
           seeAllHref="/rooms"
           seeAllLabel="See all rooms"
         >
@@ -76,6 +78,7 @@ export default async function HomePage() {
         <FeaturedSection
           id="signature-dishes"
           title="Our signature dishes"
+          intro={COPY.menu}
           seeAllHref="/menu"
           seeAllLabel="See full menu"
         >

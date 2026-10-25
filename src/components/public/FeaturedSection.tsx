@@ -3,18 +3,29 @@ import Link from "next/link";
 interface Props {
   id: string;
   title: string;
+  intro?: string;
   seeAllHref: string;
   seeAllLabel: string;
   children: React.ReactNode;
 }
 
-export default function FeaturedSection({ id, title, seeAllHref, seeAllLabel, children }: Props) {
+export default function FeaturedSection({
+  id,
+  title,
+  intro,
+  seeAllHref,
+  seeAllLabel,
+  children,
+}: Props) {
   return (
     <section aria-labelledby={`${id}-heading`} className="mx-auto max-w-6xl px-4 py-12">
       <div className="flex items-end justify-between gap-4">
-        <h2 id={`${id}-heading`} className="text-2xl font-bold text-gray-900 md:text-3xl">
-          {title}
-        </h2>
+        <div>
+          <h2 id={`${id}-heading`} className="text-2xl font-bold text-gray-900 md:text-3xl">
+            {title}
+          </h2>
+          {intro && <p className="mt-2 max-w-2xl text-gray-600">{intro}</p>}
+        </div>
         <Link href={seeAllHref} className="shrink-0 text-sm font-semibold text-brand-700 hover:underline">
           {seeAllLabel} <span aria-hidden="true">&rarr;</span>
         </Link>

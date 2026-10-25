@@ -18,19 +18,22 @@ export default async function PublicLayout({
   ]);
 
   return (
-    <>
+    <div className="public-theme flex flex-1 flex-col">
       <a
         href="#main"
         className="sr-only focus:not-sr-only focus:absolute focus:left-2 focus:top-2 focus:z-50 focus:rounded focus:bg-white focus:px-3 focus:py-2 focus:text-sm focus:shadow"
       >
         Skip to content
       </a>
-      <Header hotelName={settings.hotelName} tickerMessages={settings.tickerMessages} />
+      <Header
+        hotelName={settings.hotelName}
+        tickerMessages={settings.tickerMessages}
+      />
       <main id="main" className="flex-1">
         {children}
       </main>
       <Footer settings={settings} />
       <NoticePopup notices={notices} />
-    </>
+    </div>
   );
 }

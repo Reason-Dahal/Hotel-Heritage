@@ -89,6 +89,7 @@ Table site_settings {
   youtubeUrl varchar
   mapEmbedUrl varchar [note: 'must start with https://www.google.com/maps/embed']
   heroImage varchar [note: 'Cloudinary image URL for the homepage main photo']
+  heroImageAlt varchar [note: 'description of the main photo; used as alt text and in link previews']
   heroSubtitle varchar [note: 'text on the main photo; separate from the tagline']
   bannerMessages varchar[] [note: 'maximum 10; rotate in the banner under the main photo']
   tickerMessages varchar[] [note: 'maximum 10; move in the header ticker on every page']

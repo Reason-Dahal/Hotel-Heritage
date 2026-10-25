@@ -100,6 +100,7 @@ export const siteSettingsInputSchema = z.object({
     )
     .optional(),
   heroImage: optionalHttpUrl.optional(),
+  heroImageAlt: z.string().trim().max(160).optional(),
   heroSubtitle: z.string().trim().max(160).optional(),
   bannerMessages: messageList,
   tickerMessages: messageList,

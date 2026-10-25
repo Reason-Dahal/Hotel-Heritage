@@ -13,6 +13,7 @@ export interface SiteSettingsDTO {
   youtubeUrl: string;
   mapEmbedUrl: string;
   heroImage: string;
+  heroImageAlt: string;
   heroSubtitle: string;
   bannerMessages: string[];
   tickerMessages: string[];
@@ -34,6 +35,7 @@ export const DEFAULT_SETTINGS: SiteSettingsDTO = {
   youtubeUrl: "",
   mapEmbedUrl: "",
   heroImage: "",
+  heroImageAlt: "",
   heroSubtitle: "",
   bannerMessages: [],
   tickerMessages: [],

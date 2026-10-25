@@ -4,16 +4,17 @@ interface Props {
   hotelName: string;
   subtitle: string;
   image: string;
+  imageAlt: string;
 }
 
-export default function Hero({ hotelName, subtitle, image }: Props) {
+export default function Hero({ hotelName, subtitle, image, imageAlt }: Props) {
   return (
     <section className="relative isolate flex h-[60vh] max-h-[640px] min-h-80 items-center justify-center overflow-hidden bg-ink">
       {image && (
         <>
           <Image
             src={image}
-            alt={`Photo of ${hotelName}`}
+            alt={imageAlt || `Photo of ${hotelName}`}
             fill
             priority
             sizes="100vw"

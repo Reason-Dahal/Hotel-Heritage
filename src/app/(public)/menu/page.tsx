@@ -5,18 +5,21 @@ import {
   getMenuCategories,
   groupMenuByCategory,
 } from "@/lib/content";
+import { pageMetadata } from "@/lib/seo";
+import { menuJsonLd } from "@/lib/structuredData";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/public/PageHeader";
 import MenuBrowser from "@/components/public/MenuBrowser";
 
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { hotelName } = await getSiteSettings();
-  return {
+  const settings = await getSiteSettings();
+  return pageMetadata(settings, {
     title: "Menu",
-    description: `Browse the full menu at ${hotelName}: dishes, descriptions, and prices.`,
-    alternates: { canonical: "/menu" },
-  };
+    description: `Browse the full menu at ${settings.hotelName}: dishes, descriptions, and prices.`,
+    path: "/menu",
+  });
 }
 
 export default async function MenuPage() {
@@ -29,6 +32,12 @@ export default async function MenuPage() {
 
   return (
     <>
+      {sections.length > 0 && (
+        <JsonLd
+          data={menuJsonLd(`${settings.hotelName} menu`, sections, settings.currency)}
+        />
+      )}
+
       <PageHeader
         title="Our menu"
         intro="Freshly prepared dishes, served daily. Prices are shown in full, with any current offers."

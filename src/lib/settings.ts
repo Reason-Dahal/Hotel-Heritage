@@ -24,6 +24,7 @@ export const getSiteSettings = cache(async (): Promise<SiteSettingsDTO> => {
     youtubeUrl: doc.youtubeUrl ?? "",
     mapEmbedUrl: doc.mapEmbedUrl ?? "",
     heroImage: doc.heroImage ?? "",
+    heroImageAlt: doc.heroImageAlt ?? "",
     heroSubtitle: doc.heroSubtitle ?? "",
     bannerMessages: doc.bannerMessages ?? [],
     tickerMessages: doc.tickerMessages ?? [],

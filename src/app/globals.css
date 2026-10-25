@@ -103,3 +103,51 @@ body {
   color: var(--foreground);
   font-family: var(--font-geist-sans), Arial, Helvetica, sans-serif;
 }
+
+/* Aged-parchment surfaces for the header and footer. Each one starts exactly
+   at the page color and deepens gently, so there is never a visible edge.
+   To change the feel, edit the two colors: lighter = airy, deeper = more antique. */
+   .public-theme {
+    --parchment: #f1e6d0;
+    --parchment-deep: #e7d8bb;
+  }
+  
+  .header-surface {
+    background-image: linear-gradient(
+      to bottom,
+      var(--parchment),
+      var(--color-gray-50)
+    );
+  }
+  
+  .footer-surface {
+    background-image: linear-gradient(
+      to bottom,
+      var(--color-gray-50),
+      var(--parchment) 45%,
+      var(--parchment-deep)
+    );
+  }/* Aged-parchment surfaces for the header and footer. Each one starts exactly
+   at the page color and deepens gently, so there is never a visible edge.
+   To change the feel, edit the two colors: lighter = airy, deeper = more antique. */
+.public-theme {
+  --parchment: #ebdcc1;
+  --parchment-deep: #dfcca6;
+}
+
+.header-surface {
+  background-image: linear-gradient(
+    to bottom,
+    var(--parchment),
+    var(--color-gray-50)
+  );
+}
+
+.footer-surface {
+  background-image: linear-gradient(
+    to bottom,
+    var(--color-gray-50),
+    var(--parchment) 45%,
+    var(--parchment-deep)
+  );
+}

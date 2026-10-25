@@ -40,7 +40,7 @@ export default async function MenuPage() {
       )}
 
       <PageHeader
-        title="Our menu"
+        title="Our Menu"
         intro={COPY.menu}
       />
 

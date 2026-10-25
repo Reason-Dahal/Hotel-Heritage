@@ -19,7 +19,7 @@ export default function Hero({ hotelName, subtitle, image, imageAlt }: Props) {
             fill
             priority
             sizes="100vw"
-            className="-z-10 object-cover"
+            className="-z-10 object-cover opacity-80 "
           />
           {/* Darkens the photo so the white text always stays readable */}
           <div aria-hidden="true" className="absolute inset-0 -z-10 bg-black/45" />

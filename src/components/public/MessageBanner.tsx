@@ -29,7 +29,7 @@ export default function MessageBanner({ messages }: { messages: string[] }) {
       onMouseLeave={() => setPaused(false)}
       onFocus={() => setPaused(true)}
       onBlur={() => setPaused(false)}
-      className="border-y border-brand-100 bg-brand-50"
+      // className="border-y border-brand-100 bg-brand-50"
     >
       <div className="mx-auto max-w-6xl px-4 py-5 text-center md:py-7">
         {/* All messages share one grid cell, so the banner is always as tall

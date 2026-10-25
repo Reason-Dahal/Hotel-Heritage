@@ -5,7 +5,7 @@ interface Props {
 
 export default function PageHeader({ title, intro }: Props) {
   return (
-    <div className="border-b border-brand-100 bg-brand-50">
+    <div /*className="border-b border-brand-100 bg-brand-50"*/>
       <div className="mx-auto max-w-6xl px-4 py-5 text-center md:py-10">
         <h1 className="text-2xl font-bold text-gray-900 md:text-4xl">{title}</h1>
         {intro && (

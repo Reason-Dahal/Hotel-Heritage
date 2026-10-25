@@ -26,7 +26,7 @@ export default function RoomsBrowser({ rooms, currency, booking }: Props) {
 
   return (
     <div>
-      <div className="sticky top-0 z-30 border-b border-gray-200 bg-white/95 backdrop-blur">
+      <div className="sticky top-0 z-30  backdrop-blur">
         <div className="mx-auto max-w-6xl px-4 py-3">
           <SearchBox
             id="rooms-search"

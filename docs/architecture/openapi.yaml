@@ -1029,6 +1029,9 @@ components:
           description: Must start with https://www.google.com/maps/embed, or be empty
         heroImage:
           type: string
+        heroImageAlt:
+          type: string
+          maxLength: 160
         heroSubtitle:
           type: string
           maxLength: 160

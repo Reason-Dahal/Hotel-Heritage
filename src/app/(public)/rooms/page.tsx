@@ -2,18 +2,21 @@ import type { Metadata } from "next";
 import { getSiteSettings } from "@/lib/settings";
 import { getAllRooms } from "@/lib/content";
 import { telHref } from "@/lib/contact";
+import { pageMetadata } from "@/lib/seo";
+import { roomsJsonLd } from "@/lib/structuredData";
+import JsonLd from "@/components/JsonLd";
 import PageHeader from "@/components/public/PageHeader";
 import RoomsBrowser from "@/components/public/RoomsBrowser";
 
 export const revalidate = 3600;
 
 export async function generateMetadata(): Promise<Metadata> {
-  const { hotelName } = await getSiteSettings();
-  return {
+  const settings = await getSiteSettings();
+  return pageMetadata(settings, {
     title: "Rooms",
-    description: `Explore the rooms at ${hotelName}: photos, capacity, and nightly prices.`,
-    alternates: { canonical: "/rooms" },
-  };
+    description: `Explore the rooms at ${settings.hotelName}: photos, capacity, and nightly prices.`,
+    path: "/rooms",
+  });
 }
 
 export default async function RoomsPage() {
@@ -22,6 +25,10 @@ export default async function RoomsPage() {
 
   return (
     <>
+      {rooms.length > 0 && (
+        <JsonLd data={roomsJsonLd(rooms, settings.currency)} />
+      )}
+
       <PageHeader
         title="Our rooms"
         intro="Comfortable stays with clear pricing. All prices are per night."
@@ -33,16 +40,14 @@ export default async function RoomsPage() {
         </p>
       ) : (
         <>
-
-        <RoomsBrowser
-          rooms={rooms}
-          currency={settings.currency}
-          booking={{
-            whatsappNumber: settings.whatsappNumber,
-            hotelName: settings.hotelName,
-          }}
-        />
-          
+          <RoomsBrowser
+            rooms={rooms}
+            currency={settings.currency}
+            booking={{
+              whatsappNumber: settings.whatsappNumber,
+              hotelName: settings.hotelName,
+            }}
+          />
 
           {(phone || email) && (
             <section

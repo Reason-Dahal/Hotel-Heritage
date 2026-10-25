@@ -18,6 +18,15 @@ export default function HomepageSection({ form, update }: SectionProps) {
         </p>
       </div>
       <TextField
+        id="settings-heroImageAlt"
+        label="Main photo description (for search engines and screen readers)"
+        maxLength={160}
+        placeholder="e.g. Front view of the hotel at sunset"
+        className="sm:col-span-2"
+        value={form.heroImageAlt}
+        onChange={(e) => update({ heroImageAlt: e.target.value })}
+      />
+      <TextField
         id="settings-heroSubtitle"
         label="Text on the main photo"
         maxLength={160}

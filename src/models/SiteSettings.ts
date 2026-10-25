@@ -22,6 +22,7 @@ const SiteSettingsSchema = new Schema<ISiteSettings>(
     youtubeUrl: { type: String, default: "" },
     mapEmbedUrl: { type: String, default: "" },
     heroImage: { type: String, default: "" },
+    heroImageAlt: { type: String, default: "" },
     heroSubtitle: { type: String, default: "" },
     bannerMessages: { type: [String], default: [] },
     tickerMessages: { type: [String], default: [] },

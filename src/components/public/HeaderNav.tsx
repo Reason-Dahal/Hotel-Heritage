@@ -66,7 +66,7 @@ export default function HeaderNav() {
                 className={`block px-3 py-2 text-sm tracking-wide md:py-2.5 ${
                   active
                     ? "font-semibold text-brand-700"
-                    : "font-medium text-gray-600 hover:text-brand-700"
+                    : "font-medium text-gray-700 hover:text-brand-700"
                 }`}
               >
                 {label}

@@ -31,7 +31,7 @@ export default async function RoomsPage() {
       )}
 
       <PageHeader
-        title="Our rooms"
+        title="Our Rooms"
         intro={COPY.rooms}
 
       />

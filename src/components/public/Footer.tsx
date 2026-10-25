@@ -8,6 +8,9 @@ const SOCIALS = [
   { key: "youtubeUrl", label: "YouTube" },
 ] as const;
 
+const linkClass =
+  "underline-offset-4 hover:text-brand-800 hover:underline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600";
+
 export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
   const {
     hotelName,
@@ -22,33 +25,33 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
   const hasContact = address || phone || email || whatsappNumber;
 
   return (
-    <footer id="contact" className="mt-16 bg-ink text-gray-300">
-      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 py-10 md:grid-cols-3">
+    <footer id="contact" className="footer-surface mt-16 text-gray-700">
+      <div className="mx-auto grid max-w-6xl grid-cols-1 gap-8 px-4 pb-10 pt-14 md:grid-cols-3">
         <div>
-          <p className="text-lg font-semibold text-white">{hotelName}</p>
+          <p className="text-lg font-semibold text-brand-800">{hotelName}</p>
           {tagline && <p className="mt-1 text-sm">{tagline}</p>}
           {description && (
-            <p className="mt-3 text-sm text-gray-400">{description}</p>
+            <p className="mt-3 text-sm text-gray-600">{description}</p>
           )}
         </div>
 
         {hasContact && (
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-white">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-800">
               Contact
             </h2>
             <address className="mt-3 space-y-2 break-words text-sm not-italic">
               {address && <p>{address}</p>}
               {phone && (
                 <p>
-                  <a href={telHref(phone)} className="hover:text-white">
+                  <a href={telHref(phone)} className={linkClass}>
                     {phone}
                   </a>
                 </p>
               )}
               {email && (
                 <p>
-                  <a href={`mailto:${email}`} className="hover:text-white">
+                  <a href={`mailto:${email}`} className={linkClass}>
                     {email}
                   </a>
                 </p>
@@ -59,7 +62,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
                     href={whatsappHref(whatsappNumber)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="hover:text-white"
+                    className={linkClass}
                   >
                     Chat on WhatsApp
                     <span className="sr-only"> (opens in a new tab)</span>
@@ -72,7 +75,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
 
         {socials.length > 0 && (
           <div>
-            <h2 className="text-sm font-semibold uppercase tracking-wider text-white">
+            <h2 className="text-sm font-semibold uppercase tracking-wider text-brand-800">
               Follow us
             </h2>
             <ul className="mt-3 flex flex-wrap gap-3">
@@ -83,7 +86,7 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
                     target="_blank"
                     rel="noopener noreferrer"
                     aria-label={`${hotelName} on ${label}`}
-                    className="inline-block rounded border border-gray-600 px-3 py-1.5 text-sm hover:border-white hover:text-white"
+                    className="inline-block rounded border border-brand-700/40 px-3 py-1.5 text-sm text-brand-800 hover:border-brand-700 hover:bg-brand-700 hover:text-white focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-brand-600"
                   >
                     {label}
                   </a>
@@ -94,9 +97,9 @@ export default function Footer({ settings }: { settings: SiteSettingsDTO }) {
         )}
       </div>
 
-      <div className="border-t border-gray-800 py-4 text-center text-xs text-gray-400">
+      <p className="px-4 pb-6 text-center text-xs text-gray-600">
         &copy; {new Date().getFullYear()} {hotelName}. All rights reserved.
-      </div>
+      </p>
     </footer>
   );
 }

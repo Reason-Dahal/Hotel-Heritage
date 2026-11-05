@@ -23,10 +23,19 @@ function problemWith(file: File): string | null {
 }
 
 async function uploadToCloudinary(file: File): Promise<string> {
-  // 1. Ask our server for a signature (admin-only)
+  // 1. Ask our server for a signature (admin-only). The signature also locks
+  //    the allowed formats and the maximum size of the stored photo.
   const signRes = await fetch("/api/upload/sign", { method: "POST" });
   if (!signRes.ok) throw new Error("Not authorized to upload.");
-  const { signature, timestamp, folder, apiKey, cloudName } = await signRes.json();
+  const {
+    signature,
+    timestamp,
+    folder,
+    allowed_formats,
+    transformation,
+    apiKey,
+    cloudName,
+  } = await signRes.json();
 
   // 2. Send the file straight to Cloudinary
   const formData = new FormData();
@@ -35,6 +44,8 @@ async function uploadToCloudinary(file: File): Promise<string> {
   formData.append("timestamp", String(timestamp));
   formData.append("signature", signature);
   formData.append("folder", folder);
+  formData.append("allowed_formats", allowed_formats);
+  formData.append("transformation", transformation);
 
   const uploadRes = await fetch(
     `https://api.cloudinary.com/v1_1/${cloudName}/image/upload`,

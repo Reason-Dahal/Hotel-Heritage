@@ -21,7 +21,9 @@ export default function LoginPage() {
     });
 
     if (result?.error) {
-      setError("Invalid email or password");
+      setError(
+        "Invalid email or password. After several failed attempts, sign-in is paused for 15 minutes."
+      );
     } else {
       router.push("/admin");
     }

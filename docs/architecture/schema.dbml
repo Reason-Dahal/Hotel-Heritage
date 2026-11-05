@@ -108,3 +108,12 @@ Table admins {
 
   Note: 'One admin account. Created with scripts/createAdmin.ts; there is no public sign-up.'
 }
+
+  Table login_attempts {
+    _id ObjectId [pk]
+    ip varchar [not null, note: 'client address as reported by the host']
+    email varchar [not null, note: 'lowercased email that was tried']
+    createdAt datetime [note: 'records delete themselves after 15 minutes (TTL index)']
+
+    Note: 'One row per failed admin login, used for rate limiting. A successful login clears them.'
+  }

@@ -17,13 +17,14 @@ flowchart TB
         panelLayout["Panel layout<br/>checks the session again"]
     end
 
-    guard["Route guard (middleware)<br/>/admin needs a session<br/>uses the edge-safe config only"]
+    guard["Route guard (proxy)<br/>/admin needs a session<br/>uses the edge-safe config only"]
 
     subgraph authBox["Authentication"]
         authConfig["auth.config.ts<br/>edge-safe rules"]
         authFull["auth.ts<br/>login check with bcrypt"]
         nextauth["/api/auth/[...nextauth]<br/>login, session, logout"]
         requireAdmin["requireAdmin()<br/>401 when there is no session"]
+        loginGuard["loginGuard.ts<br/>blocks repeated failed logins"]
     end
 
     subgraph apiRoutes["API routes"]

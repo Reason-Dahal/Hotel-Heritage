@@ -5,7 +5,7 @@ export const authConfig: NextAuthConfig = {
     signIn: "/admin/login",
   },
   providers: [],
-  session: { strategy: "jwt" },
+  session: { strategy: "jwt", maxAge: 60 * 60 * 8 }, // 8 hours
   callbacks: {
     authorized({ auth, request: { nextUrl } }) {
       const isLoggedIn = !!auth?.user;

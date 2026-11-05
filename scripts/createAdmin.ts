@@ -20,6 +20,10 @@ async function main() {
     console.error("Usage: npx tsx scripts/createAdmin.ts <email> <password>");
     process.exit(1);
   }
+  if (password.length < 12) {
+    console.error("Use a password of at least 12 characters.");
+    process.exit(1);
+  }
 
   await mongoose.connect(process.env.MONGODB_URI as string);
   const Admin = mongoose.models.Admin || mongoose.model("Admin", AdminSchema);

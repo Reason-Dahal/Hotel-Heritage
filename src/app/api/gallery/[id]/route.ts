@@ -1,10 +1,11 @@
-import { NextResponse } from "next/server";
+import { NextResponse, after } from "next/server";
 import connectDB from "@/lib/db";
 import GalleryImage from "@/models/GalleryImage";
 import { galleryUpdateSchema } from "@/lib/validation";
 import { requireAdmin } from "@/lib/requireAdmin";
 import { revalidatePublicSite } from "@/lib/revalidate";
 import { isObjectId } from "@/lib/objectId";
+import { deleteCloudinaryImages } from "@/lib/cloudinaryCleanup";
 
 const INVALID_ID = { success: false, error: "Invalid photo id" };
 const NOT_FOUND = { success: false, error: "Photo not found" };
@@ -61,6 +62,9 @@ export async function DELETE(
 
     const image = await GalleryImage.findByIdAndDelete(id);
     if (!image) return NextResponse.json(NOT_FOUND, { status: 404 });
+
+    const url: string = image.url;
+    after(() => deleteCloudinaryImages([url]));
 
     revalidatePublicSite();
     return NextResponse.json({ success: true, message: "Photo removed" });

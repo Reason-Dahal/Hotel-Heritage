@@ -49,3 +49,5 @@ Split the NextAuth configuration into two files:
   A developer unfamiliar with this split could initially be confused
   about which file to edit; this ADR exists specifically to resolve that
   confusion.
+  
+Update (Next.js 16): middleware was renamed proxy, so the route guard now lives in src/proxy.ts, and it runs on the Node.js runtime by default. The split into auth.config.ts and auth.ts is kept on purpose: it keeps the guard lightweight, with no password hashing or database code on the path that runs for every /admin request.
